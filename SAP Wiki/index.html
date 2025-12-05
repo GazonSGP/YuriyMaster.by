@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAP Wiki - Локальная база знаний</title>
+    <title>SAP Wiki - Персональная база знаний</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -28,6 +28,47 @@
             background: var(--sap-grey);
             color: #32363a;
             min-height: 100vh;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--sap-blue) 0%, var(--sap-blue-dark) 100%);
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-logo {
+            font-size: 2.5rem;
+            color: var(--sap-blue);
+            margin-bottom: 1rem;
+        }
+        
+        /* Main App (hidden until login) */
+        .app-container {
+            display: none;
         }
         
         /* Header */
@@ -57,10 +98,22 @@
             font-size: 1.8rem;
         }
         
-        .user-menu {
+        .user-info {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
         }
         
         .btn {
@@ -518,289 +571,414 @@
             align-items: center;
             gap: 10px;
         }
+        
+        /* Input styles for login */
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--sap-blue);
+            box-shadow: 0 0 0 3px rgba(10, 110, 209, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--sap-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .login-btn:hover {
+            background: var(--sap-blue-dark);
+            box-shadow: 0 5px 15px rgba(10, 110, 209, 0.3);
+        }
+        
+        .user-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--sap-grey-dark);
+            font-size: 0.9rem;
+        }
+        
+        .user-switch a {
+            color: var(--sap-blue);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .user-switch a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">
-            <i class="fas fa-book"></i>
-            <span>SAP Wiki - Локальная база знаний</span>
-        </div>
-        
-        <div class="user-menu">
-            <button class="btn" onclick="showModal('newInstructionModal', true)">
-                <i class="fas fa-plus"></i> Новая инструкция
-            </button>
-            <button class="btn" onclick="showModal('adminModal')">
-                <i class="fas fa-cog"></i> Управление
-            </button>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="modules">
-                <h3><i class="fas fa-layer-group"></i> Модули SAP</h3>
-                <ul class="module-list" id="moduleList">
-                    <!-- Modules loaded by JavaScript -->
-                </ul>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h2>Добро пожаловать в SAP Wiki</h2>
+                <p style="color: var(--sap-grey-dark); margin-top: 0.5rem;">Персональная база знаний</p>
             </div>
             
-            <div style="margin-top: 2rem;">
-                <h3><i class="fas fa-chart-line"></i> Статистика</h3>
-                <div id="stats" style="margin-top: 1rem;">
-                    <!-- Stats loaded by JavaScript -->
+            <div id="loginFormContainer">
+                <form id="loginForm">
+                    <input type="text" class="login-input" id="username" 
+                           placeholder="Введите ваше имя" required>
+                    <input type="email" class="login-input" id="userEmail" 
+                           placeholder="Email (необязательно)">
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Начать работу
+                    </button>
+                </form>
+                
+                <div class="user-switch">
+                    <p>Или <a onclick="showUserList()">продолжить как существующий пользователь</a></p>
                 </div>
             </div>
-        </aside>
+            
+            <div id="userListContainer" style="display: none;">
+                <h3 style="margin-bottom: 1rem; text-align: center;">Выберите пользователя</h3>
+                <div id="userList"></div>
+                <button class="login-btn secondary" onclick="showLoginForm()" style="background: #f0f0f0; color: #333; margin-top: 1rem;">
+                    <i class="fas fa-user-plus"></i> Новый пользователь
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 1.5rem; color: var(--sap-grey-dark); font-size: 0.85rem;">
+                <i class="fas fa-info-circle"></i> Данные хранятся локально в вашем браузере
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main App (hidden until login) -->
+    <div id="appContainer" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-book"></i>
+                <span>SAP Wiki - <span id="currentUserName"></span></span>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <div>
+                    <div style="font-weight: 500;" id="headerUserName"></div>
+                    <div style="font-size: 0.85rem; opacity: 0.9;" id="userDataInfo"></div>
+                </div>
+                <button class="btn" onclick="showModal('newInstructionModal', true)">
+                    <i class="fas fa-plus"></i> Новая инструкция
+                </button>
+                <button class="btn" onclick="showModal('adminModal')">
+                    <i class="fas fa-cog"></i> Управление
+                </button>
+                <button class="btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
+            </div>
+        </header>
 
-        <!-- Main Content -->
-        <main class="content">
-            <div class="page-header">
-                <h1 class="page-title" id="pageTitle">Все инструкции</h1>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="searchInput" placeholder="Поиск инструкций..." 
-                           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
-                    <button class="action-btn" onclick="searchInstructions()">
-                        <i class="fas fa-search"></i>
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="modules">
+                    <h3><i class="fas fa-layer-group"></i> Модули SAP</h3>
+                    <ul class="module-list" id="moduleList">
+                        <!-- Modules loaded by JavaScript -->
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3><i class="fas fa-chart-line"></i> Статистика</h3>
+                    <div id="stats" style="margin-top: 1rem;">
+                        <!-- Stats loaded by JavaScript -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content">
+                <div class="page-header">
+                    <h1 class="page-title" id="pageTitle">Все инструкции</h1>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="searchInput" placeholder="Поиск инструкций..." 
+                               style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                        <button class="action-btn" onclick="searchInstructions()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Instruction Cards -->
+                <div class="card-grid" id="instructionsGrid">
+                    <!-- Cards loaded by JavaScript -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Modal: New Instruction -->
+        <div id="newInstructionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Создать новую инструкцию</h2>
+                    <button class="close-modal" onclick="hideModal('newInstructionModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="instructionForm">
+                        <div class="form-group">
+                            <label class="form-label">Название инструкции *</label>
+                            <input type="text" class="form-input" id="instructionTitle" 
+                                   placeholder="Например: ME21N - Создание заказа на закупку" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Модуль *</label>
+                            <select class="form-select" id="instructionModule" required>
+                                <option value="">Выберите модуль</option>
+                                <option value="MM">MM - Материальный менеджмент</option>
+                                <option value="FI">FI - Финансы</option>
+                                <option value="SD">SD - Продажи и дистрибуция</option>
+                                <option value="PP">PP - Планирование производства</option>
+                                <option value="CO">CO - Контроллинг</option>
+                                <option value="HR">HR - Управление персоналом</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Описание</label>
+                            <textarea class="form-textarea" id="instructionDescription" 
+                                      placeholder="Краткое описание инструкции..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Теги (через запятую)</label>
+                            <input type="text" class="form-input" id="instructionTags" 
+                                   placeholder="ME21N, закупки, материалы">
+                        </div>
+                        
+                        <!-- Tabs for steps and media -->
+                        <div class="modal-tabs">
+                            <button type="button" class="modal-tab active" onclick="showTab('stepsTab')">Шаги</button>
+                            <button type="button" class="modal-tab" onclick="showTab('mediaTab')">Медиа</button>
+                            <button type="button" class="modal-tab" onclick="showTab('codeTab')">Код</button>
+                        </div>
+                        
+                        <!-- Steps Tab -->
+                        <div id="stepsTab" class="tab-content active">
+                            <div class="form-group">
+                                <label class="form-label">Пошаговая инструкция</label>
+                                <textarea class="form-textarea" id="instructionSteps" 
+                                          placeholder="Введите каждый шаг с новой строки..."></textarea>
+                                <small style="color: #666;">Каждый шаг с новой строки</small>
+                            </div>
+                            
+                            <button type="button" class="action-btn secondary" onclick="addStepField()">
+                                <i class="fas fa-plus"></i> Добавить шаг
+                            </button>
+                            
+                            <div id="stepsContainer" style="margin-top: 1rem;"></div>
+                        </div>
+                        
+                        <!-- Media Tab -->
+                        <div id="mediaTab" class="tab-content">
+                            <div class="form-group">
+                                <label class="form-label">Ссылки на изображения или видео</label>
+                                <textarea class="form-textarea" id="instructionMedia" 
+                                          placeholder="Введите ссылки на изображения или видео (каждую с новой строки)..."></textarea>
+                                <small style="color: #666;">Пример: images/me21n-step1.png или https://site.com/video.mp4</small>
+                            </div>
+                            
+                            <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-top: 1rem;">
+                                <h4 style="margin-bottom: 0.5rem;">Или загрузите локальные файлы:</h4>
+                                <input type="file" id="fileUpload" multiple 
+                                       style="margin-top: 0.5rem;"
+                                       onchange="handleFileUpload(this.files)">
+                                <div id="uploadPreview" style="margin-top: 1rem;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Code Tab -->
+                        <div id="codeTab" class="tab-content">
+                            <div class="form-group">
+                                <label class="form-label">Код транзакции</label>
+                                <input type="text" class="form-input" id="instructionCode" 
+                                       placeholder="Например: ME21N, FB01, VA01">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Дополнительные заметки</label>
+                                <textarea class="form-textarea" id="instructionNotes" 
+                                          placeholder="Важные примечания, частые ошибки..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                            <button type="submit" class="action-btn" style="flex: 1;">
+                                <i class="fas fa-save"></i> Сохранить инструкцию
+                            </button>
+                            <button type="button" class="action-btn secondary" onclick="hideModal('newInstructionModal')" style="width: 100px;">
+                                Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: View Instruction -->
+        <div id="viewInstructionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="viewTitle"></h2>
+                    <button class="close-modal" onclick="hideModal('viewInstructionModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+                        <span class="card-badge" id="viewModule"></span>
+                        <span style="color: #666;" id="viewDate"></span>
+                    </div>
+                    
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <button class="tab-btn active" onclick="showViewTab('contentTab')">Описание</button>
+                            <button class="tab-btn" onclick="showViewTab('stepsTab')">Шаги</button>
+                            <button class="tab-btn" onclick="showViewTab('mediaTab')">Медиа</button>
+                            <button class="tab-btn" onclick="showViewTab('notesTab')">Заметки</button>
+                        </div>
+                        
+                        <div id="viewContentTab" class="tab-content active">
+                            <p id="viewDescription"></p>
+                        </div>
+                        
+                        <div id="viewStepsTab" class="tab-content">
+                            <div id="viewSteps"></div>
+                        </div>
+                        
+                        <div id="viewMediaTab" class="tab-content">
+                            <div id="viewMedia"></div>
+                        </div>
+                        
+                        <div id="viewNotesTab" class="tab-content">
+                            <div id="viewNotes"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-tags" id="viewTags" style="margin-top: 2rem;"></div>
+                </div>
+                <div class="modal-header" style="justify-content: flex-end;">
+                    <button class="action-btn secondary" onclick="editCurrentInstruction()">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </button>
+                    <button class="action-btn" onclick="printInstruction()" style="margin-left: 10px;">
+                        <i class="fas fa-print"></i> Печать
+                    </button>
+                    <button class="action-btn secondary" onclick="deleteCurrentInstruction()" style="margin-left: 10px; background: #dc3545; color: white;">
+                        <i class="fas fa-trash"></i> Удалить
                     </button>
                 </div>
             </div>
-            
-            <!-- Instruction Cards -->
-            <div class="card-grid" id="instructionsGrid">
-                <!-- Cards loaded by JavaScript -->
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal: New Instruction -->
-    <div id="newInstructionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Создать новую инструкцию</h2>
-                <button class="close-modal" onclick="hideModal('newInstructionModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="instructionForm">
-                    <div class="form-group">
-                        <label class="form-label">Название инструкции *</label>
-                        <input type="text" class="form-input" id="instructionTitle" 
-                               placeholder="Например: ME21N - Создание заказа на закупку" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Модуль *</label>
-                        <select class="form-select" id="instructionModule" required>
-                            <option value="">Выберите модуль</option>
-                            <option value="MM">MM - Материальный менеджмент</option>
-                            <option value="FI">FI - Финансы</option>
-                            <option value="SD">SD - Продажи и дистрибуция</option>
-                            <option value="PP">PP - Планирование производства</option>
-                            <option value="CO">CO - Контроллинг</option>
-                            <option value="HR">HR - Управление персоналом</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Описание</label>
-                        <textarea class="form-textarea" id="instructionDescription" 
-                                  placeholder="Краткое описание инструкции..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Теги (через запятую)</label>
-                        <input type="text" class="form-input" id="instructionTags" 
-                               placeholder="ME21N, закупки, материалы">
-                    </div>
-                    
-                    <!-- Tabs for steps and media -->
-                    <div class="modal-tabs">
-                        <button type="button" class="modal-tab active" onclick="showTab('stepsTab')">Шаги</button>
-                        <button type="button" class="modal-tab" onclick="showTab('mediaTab')">Медиа</button>
-                        <button type="button" class="modal-tab" onclick="showTab('codeTab')">Код</button>
-                    </div>
-                    
-                    <!-- Steps Tab -->
-                    <div id="stepsTab" class="tab-content active">
-                        <div class="form-group">
-                            <label class="form-label">Пошаговая инструкция</label>
-                            <textarea class="form-textarea" id="instructionSteps" 
-                                      placeholder="Введите каждый шаг с новой строки..."></textarea>
-                            <small style="color: #666;">Каждый шаг с новой строки</small>
-                        </div>
-                        
-                        <button type="button" class="action-btn secondary" onclick="addStepField()">
-                            <i class="fas fa-plus"></i> Добавить шаг
-                        </button>
-                        
-                        <div id="stepsContainer" style="margin-top: 1rem;"></div>
-                    </div>
-                    
-                    <!-- Media Tab -->
-                    <div id="mediaTab" class="tab-content">
-                        <div class="form-group">
-                            <label class="form-label">Ссылки на изображения или видео</label>
-                            <textarea class="form-textarea" id="instructionMedia" 
-                                      placeholder="Введите ссылки на изображения или видео (каждую с новой строки)..."></textarea>
-                            <small style="color: #666;">Пример: images/me21n-step1.png или https://site.com/video.mp4</small>
-                        </div>
-                        
-                        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-top: 1rem;">
-                            <h4 style="margin-bottom: 0.5rem;">Или загрузите локальные файлы:</h4>
-                            <input type="file" id="fileUpload" multiple 
-                                   style="margin-top: 0.5rem;"
-                                   onchange="handleFileUpload(this.files)">
-                            <div id="uploadPreview" style="margin-top: 1rem;"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Code Tab -->
-                    <div id="codeTab" class="tab-content">
-                        <div class="form-group">
-                            <label class="form-label">Код транзакции</label>
-                            <input type="text" class="form-input" id="instructionCode" 
-                                   placeholder="Например: ME21N, FB01, VA01">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Дополнительные заметки</label>
-                            <textarea class="form-textarea" id="instructionNotes" 
-                                      placeholder="Важные примечания, частые ошибки..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 10px; margin-top: 2rem;">
-                        <button type="submit" class="action-btn" style="flex: 1;">
-                            <i class="fas fa-save"></i> Сохранить инструкцию
-                        </button>
-                        <button type="button" class="action-btn secondary" onclick="hideModal('newInstructionModal')" style="width: 100px;">
-                            Отмена
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
-    </div>
 
-    <!-- Modal: View Instruction -->
-    <div id="viewInstructionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="viewTitle"></h2>
-                <button class="close-modal" onclick="hideModal('viewInstructionModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
-                    <span class="card-badge" id="viewModule"></span>
-                    <span style="color: #666;" id="viewDate"></span>
+        <!-- Modal: Admin Panel -->
+        <div id="adminModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Управление базой знаний</h2>
+                    <button class="close-modal" onclick="hideModal('adminModal')">&times;</button>
                 </div>
-                
-                <div class="tabs-container">
-                    <div class="tabs-header">
-                        <button class="tab-btn active" onclick="showViewTab('contentTab')">Описание</button>
-                        <button class="tab-btn" onclick="showViewTab('stepsTab')">Шаги</button>
-                        <button class="tab-btn" onclick="showViewTab('mediaTab')">Медиа</button>
-                        <button class="tab-btn" onclick="showViewTab('notesTab')">Заметки</button>
+                <div class="modal-body">
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+                        <h3 style="color: var(--sap-blue); margin-bottom: 0.5rem;">Текущий пользователь</h3>
+                        <p><strong>Имя:</strong> <span id="adminUserName"></span></p>
+                        <p><strong>Зарегистрирован:</strong> <span id="adminUserCreated"></span></p>
+                        <p><strong>Инструкций:</strong> <span id="adminUserInstructions"></span></p>
                     </div>
                     
-                    <div id="viewContentTab" class="tab-content active">
-                        <p id="viewDescription"></p>
-                    </div>
-                    
-                    <div id="viewStepsTab" class="tab-content">
-                        <div id="viewSteps"></div>
-                    </div>
-                    
-                    <div id="viewMediaTab" class="tab-content">
-                        <div id="viewMedia"></div>
-                    </div>
-                    
-                    <div id="viewNotesTab" class="tab-content">
-                        <div id="viewNotes"></div>
-                    </div>
-                </div>
-                
-                <div class="card-tags" id="viewTags" style="margin-top: 2rem;"></div>
-            </div>
-            <div class="modal-header" style="justify-content: flex-end;">
-                <button class="action-btn secondary" onclick="editCurrentInstruction()">
-                    <i class="fas fa-edit"></i> Редактировать
-                </button>
-                <button class="action-btn" onclick="printInstruction()" style="margin-left: 10px;">
-                    <i class="fas fa-print"></i> Печать
-                </button>
-                <button class="action-btn secondary" onclick="deleteCurrentInstruction()" style="margin-left: 10px; background: #dc3545; color: white;">
-                    <i class="fas fa-trash"></i> Удалить
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Admin Panel -->
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Управление базой знаний</h2>
-                <button class="close-modal" onclick="hideModal('adminModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                    <div class="card" onclick="exportData()" style="cursor: pointer; text-align: center;">
-                        <div style="font-size: 3rem; color: var(--sap-green); margin-bottom: 1rem;">
-                            <i class="fas fa-download"></i>
+                    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                        <div class="card" onclick="exportData()" style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 3rem; color: var(--sap-green); margin-bottom: 1rem;">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <h3>Экспорт данных</h3>
+                            <p>Скачайте все ваши инструкции</p>
                         </div>
-                        <h3>Экспорт данных</h3>
-                        <p>Скачайте все инструкции в файл</p>
+                        
+                        <div class="card" onclick="importData()" style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 3rem; color: var(--sap-blue); margin-bottom: 1rem;">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <h3>Импорт данных</h3>
+                            <p>Загрузите инструкции из файла</p>
+                        </div>
+                        
+                        <div class="card" onclick="clearAllData()" style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <h3>Очистить все</h3>
+                            <p>Удалить все ваши инструкции</p>
+                        </div>
+                        
+                        <div class="card" onclick="showBackupInfo()" style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 3rem; color: var(--sap-orange); margin-bottom: 1rem;">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h3>Информация</h3>
+                            <p>О системе и данных</p>
+                        </div>
+                        
+                        <div class="card" onclick="switchUser()" style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 3rem; color: #8b5bb1; margin-bottom: 1rem;">
+                                <i class="fas fa-user-friends"></i>
+                            </div>
+                            <h3>Сменить пользователя</h3>
+                            <p>Переключиться на другого</p>
+                        </div>
                     </div>
                     
-                    <div class="card" onclick="importData()" style="cursor: pointer; text-align: center;">
-                        <div style="font-size: 3rem; color: var(--sap-blue); margin-bottom: 1rem;">
-                            <i class="fas fa-upload"></i>
-                        </div>
-                        <h3>Импорт данных</h3>
-                        <p>Загрузите инструкции из файла</p>
+                    <div id="backupInfo" style="display: none; margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+                        <h3>О локальном хранении данных</h3>
+                        <p>Все данные хранятся в вашем браузере (localStorage).</p>
+                        <p><strong>Текущий пользователь:</strong> <span id="dataUser"></span></p>
+                        <p><strong>Путь к данным:</strong> <code id="dataPath"></code></p>
+                        <p><strong>Размер данных:</strong> <span id="dataSize"></span></p>
+                        <p><strong>Количество инструкций:</strong> <span id="dataCount"></span></p>
+                        <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                            <i class="fas fa-info-circle"></i> Каждый пользователь имеет свои данные
+                        </p>
                     </div>
-                    
-                    <div class="card" onclick="clearAllData()" style="cursor: pointer; text-align: center;">
-                        <div style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                        <h3>Очистить все</h3>
-                        <p>Удалить все инструкции</p>
-                    </div>
-                    
-                    <div class="card" onclick="showBackupInfo()" style="cursor: pointer; text-align: center;">
-                        <div style="font-size: 3rem; color: var(--sap-orange); margin-bottom: 1rem;">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <h3>Информация</h3>
-                        <p>О системе и данных</p>
-                    </div>
-                </div>
-                
-                <div id="backupInfo" style="display: none; margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
-                    <h3>О локальном хранении данных</h3>
-                    <p>Все данные хранятся в вашем браузере (localStorage).</p>
-                    <p><strong>Путь к данным:</strong> <code id="dataPath"></code></p>
-                    <p><strong>Размер данных:</strong> <span id="dataSize"></span></p>
-                    <p><strong>Количество инструкций:</strong> <span id="dataCount"></span></p>
-                    <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
-                        <i class="fas fa-info-circle"></i> Для сохранения на другой компьютер используйте экспорт/импорт
-                    </p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <div class="toast-content">
-            <i class="fas fa-check-circle"></i>
-            <span id="toastMessage">Сохранено успешно!</span>
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">
+            <div class="toast-content">
+                <i class="fas fa-check-circle"></i>
+                <span id="toastMessage">Сохранено успешно!</span>
+            </div>
         </div>
     </div>
 
@@ -810,97 +988,294 @@
         let currentModule = 'all';
         let editingId = null;
         let stepsCounter = 1;
+        let currentUser = null;
+        let allUsers = {};
 
         // ====== ИНИЦИАЛИЗАЦИЯ ======
         document.addEventListener('DOMContentLoaded', function() {
             console.log('SAP Wiki инициализирован');
-            loadInstructions();
+            loadUsers();
+            checkAutoLogin();
             setupEventListeners();
-            updateStats();
-            
-            // Показать приветственное сообщение
-            setTimeout(() => {
-                if (currentInstructions.length === 0) {
-                    showToast('Добро пожаловать в SAP Wiki! Создайте первую инструкцию.');
-                }
-            }, 1000);
         });
 
-        // ====== ХРАНЕНИЕ ДАННЫХ ======
-        function saveInstructions() {
+        // ====== УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ ======
+        function loadUsers() {
             try {
-                localStorage.setItem('sapInstructions', JSON.stringify(currentInstructions));
-                console.log('Данные сохранены:', currentInstructions.length, 'инструкций');
+                const savedUsers = localStorage.getItem('sapWikiUsers');
+                if (savedUsers) {
+                    allUsers = JSON.parse(savedUsers);
+                    console.log('Загружены пользователи:', Object.keys(allUsers).length);
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки пользователей:', e);
+                allUsers = {};
+            }
+        }
+
+        function saveUsers() {
+            try {
+                localStorage.setItem('sapWikiUsers', JSON.stringify(allUsers));
                 return true;
             } catch (e) {
-                console.error('Ошибка сохранения:', e);
-                showToast('Ошибка сохранения данных!', 'error');
+                console.error('Ошибка сохранения пользователей:', e);
                 return false;
             }
         }
 
-        function loadInstructions() {
-            try {
-                const saved = localStorage.getItem('sapInstructions');
-                if (saved) {
-                    currentInstructions = JSON.parse(saved);
-                    console.log('Данные загружены:', currentInstructions.length, 'инструкций');
-                } else {
-                    // Создаем примеры инструкций
-                    currentInstructions = [
-                        {
-                            id: 1,
-                            title: "ME21N - Создание заказа на закупку",
-                            module: "MM",
-                            description: "Пошаговая инструкция по созданию заказа на закупку материалов или услуг.",
-                            tags: ["закупки", "ME21N", "материалы"],
-                            steps: [
-                                "1. Войти в транзакцию ME21N",
-                                "2. Выбрать тип заказа NB",
-                                "3. Ввести данные поставщика",
-                                "4. Добавить позиции материалов",
-                                "5. Проверить и сохранить"
-                            ],
-                            media: [
-                                { type: 'image', url: 'https://via.placeholder.com/600x400/0a6ed1/ffffff?text=ME21N+Шаг+1' },
-                                { type: 'image', url: 'https://via.placeholder.com/600x400/107f3e/ffffff?text=ME21N+Шаг+2' }
-                            ],
-                            code: "ME21N",
-                            notes: "Проверяйте наличие материалов перед созданием заказа.",
-                            createdAt: "2024-01-15T10:00:00.000Z",
-                            updatedAt: "2024-01-15T10:00:00.000Z"
-                        },
-                        {
-                            id: 2,
-                            title: "FB01 - Проведение документа в FI",
-                            module: "FI",
-                            description: "Инструкция по проведению финансового документа.",
-                            tags: ["финансы", "FB01", "документ"],
-                            steps: [
-                                "1. Открыть транзакцию FB01",
-                                "2. Выбрать тип документа",
-                                "3. Заполнить проводки",
-                                "4. Ввести сумму",
-                                "5. Сохранить документ"
-                            ],
-                            media: [],
-                            code: "FB01",
-                            notes: "Внимательно проверяйте счета и суммы.",
-                            createdAt: "2024-01-15T11:00:00.000Z",
-                            updatedAt: "2024-01-15T11:00:00.000Z"
-                        }
-                    ];
-                    saveInstructions();
-                }
+        function checkAutoLogin() {
+            const lastUser = localStorage.getItem('sapWikiLastUser');
+            if (lastUser && allUsers[lastUser]) {
+                loginUser(lastUser);
+            }
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('userListContainer').style.display = 'none';
+        }
+
+        function showUserList() {
+            document.getElementById('loginFormContainer').style.display = 'none';
+            document.getElementById('userListContainer').style.display = 'block';
+            
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            const users = Object.keys(allUsers);
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<p style="text-align: center; color: #666; margin: 2rem 0;">Нет сохраненных пользователей</p>';
+                return;
+            }
+            
+            users.forEach(username => {
+                const user = allUsers[username];
+                const userDiv = document.createElement('div');
+                userDiv.style.cssText = `
+                    padding: 12px 16px;
+                    margin: 8px 0;
+                    background: white;
+                    border: 1px solid #e8e8e8;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                `;
                 
-                renderInstructions();
-                renderModules();
-                updateEmptyState();
+                userDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: var(--sap-blue-light); 
+                                 border-radius: 50%; display: flex; align-items: center; 
+                                 justify-content: center; font-weight: bold; color: var(--sap-blue);">
+                            ${username.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">${username}</div>
+                            <div style="font-size: 0.85rem; color: #666;">
+                                ${user.instructions || 0} инструкций
+                            </div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: #ccc;"></i>
+                `;
                 
-            } catch (e) {
-                console.error('Ошибка загрузки данных:', e);
-                showToast('Ошибка загрузки данных!', 'error');
+                userDiv.onclick = function() {
+                    loginUser(username);
+                };
+                
+                userDiv.onmouseover = function() {
+                    this.style.borderColor = 'var(--sap-blue)';
+                    this.style.boxShadow = '0 2px 8px rgba(10, 110, 209, 0.1)';
+                };
+                
+                userDiv.onmouseout = function() {
+                    this.style.borderColor = '#e8e8e8';
+                    this.style.boxShadow = 'none';
+                };
+                
+                userList.appendChild(userDiv);
+            });
+        }
+
+        // Обработчик формы входа
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            
+            if (!username) {
+                showToast('Введите имя пользователя!', 'error');
+                return;
+            }
+            
+            createOrLoginUser(username, email);
+        });
+
+        function createOrLoginUser(username, email = '') {
+            // Проверяем, существует ли пользователь
+            if (!allUsers[username]) {
+                // Создаем нового пользователя
+                allUsers[username] = {
+                    id: Date.now(),
+                    name: username,
+                    email: email,
+                    created: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    instructions: []
+                };
+                
+                saveUsers();
+                showToast(`Создан новый пользователь: ${username}`);
+            } else {
+                // Обновляем время последнего входа
+                allUsers[username].lastLogin = new Date().toISOString();
+                saveUsers();
+                showToast(`Добро пожаловать, ${username}!`);
+            }
+            
+            loginUser(username);
+        }
+
+        function loginUser(username) {
+            currentUser = allUsers[username];
+            
+            // Сохраняем как последнего пользователя
+            localStorage.setItem('sapWikiLastUser', username);
+            
+            // Загружаем инструкции пользователя
+            loadUserInstructions();
+            
+            // Показываем основное приложение
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            
+            // Обновляем информацию о пользователе в интерфейсе
+            updateUserInfo();
+            
+            // Инициализируем приложение
+            renderInstructions();
+            renderModules();
+            updateStats();
+        }
+
+        function updateUserInfo() {
+            if (!currentUser) return;
+            
+            document.getElementById('currentUserName').textContent = currentUser.name;
+            document.getElementById('headerUserName').textContent = currentUser.name;
+            document.getElementById('userDataInfo').textContent = 
+                `${currentInstructions.length} инструкций`;
+            
+            // Аватар
+            const avatar = document.getElementById('userAvatar');
+            avatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            avatar.style.background = getAvatarColor(currentUser.name);
+            
+            // В админке
+            document.getElementById('adminUserName').textContent = currentUser.name;
+            document.getElementById('adminUserCreated').textContent = 
+                new Date(currentUser.created).toLocaleDateString('ru-RU');
+            document.getElementById('adminUserInstructions').textContent = currentInstructions.length;
+        }
+
+        function getAvatarColor(username) {
+            const colors = [
+                '#0a6ed1', '#107f3e', '#e7650f', '#8b5bb1', 
+                '#e973bc', '#5899da', '#17a2b8', '#28a745'
+            ];
+            const index = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            return colors[index % colors.length];
+        }
+
+        function logout() {
+            if (confirm('Выйти из текущего пользователя?')) {
+                currentUser = null;
                 currentInstructions = [];
+                editingId = null;
+                
+                document.getElementById('appContainer').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                
+                showLoginForm();
+                showToast('Вы вышли из системы');
+            }
+        }
+
+        function switchUser() {
+            hideModal('adminModal');
+            setTimeout(() => {
+                logout();
+                setTimeout(() => {
+                    showUserList();
+                }, 300);
+            }, 300);
+        }
+
+        // ====== ХРАНЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ======
+        function loadUserInstructions() {
+            if (!currentUser) return;
+            
+            currentInstructions = currentUser.instructions || [];
+            
+            // Если у пользователя нет инструкций, создаем примеры
+            if (currentInstructions.length === 0) {
+                currentInstructions = [
+                    {
+                        id: 1,
+                        title: "ME21N - Создание заказа на закупку",
+                        module: "MM",
+                        description: "Пошаговая инструкция по созданию заказа на закупку материалов или услуг.",
+                        tags: ["закупки", "ME21N", "материалы"],
+                        steps: [
+                            "1. Войти в транзакцию ME21N",
+                            "2. Выбрать тип заказа NB",
+                            "3. Ввести данные поставщика",
+                            "4. Добавить позиции материалов",
+                            "5. Проверить и сохранить"
+                        ],
+                        media: [
+                            { type: 'image', url: 'https://via.placeholder.com/600x400/0a6ed1/ffffff?text=ME21N+Шаг+1' },
+                            { type: 'image', url: 'https://via.placeholder.com/600x400/107f3e/ffffff?text=ME21N+Шаг+2' }
+                        ],
+                        code: "ME21N",
+                        notes: "Проверяйте наличие материалов перед созданием заказа.",
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        author: currentUser.name
+                    }
+                ];
+                
+                saveUserInstructions();
+            }
+            
+            console.log(`Загружено ${currentInstructions.length} инструкций для ${currentUser.name}`);
+        }
+
+        function saveUserInstructions() {
+            if (!currentUser) return false;
+            
+            try {
+                // Обновляем инструкции пользователя
+                currentUser.instructions = currentInstructions;
+                
+                // Обновляем в общем списке пользователей
+                allUsers[currentUser.name] = currentUser;
+                
+                // Сохраняем всех пользователей
+                localStorage.setItem('sapWikiUsers', JSON.stringify(allUsers));
+                
+                // Обновляем статистику
+                updateUserInfo();
+                
+                return true;
+            } catch (e) {
+                console.error('Ошибка сохранения инструкций:', e);
+                showToast('Ошибка сохранения данных!', 'error');
+                return false;
             }
         }
 
@@ -953,7 +1328,7 @@
             const emptyState = `
                 <div class="empty-state">
                     <i class="fas fa-file-alt"></i>
-                    <h3>Инструкций пока нет</h3>
+                    <h3>У вас пока нет инструкций</h3>
                     <p>Создайте свою первую инструкцию</p>
                     <button class="action-btn" onclick="showModal('newInstructionModal', true)" style="margin-top: 1rem;">
                         <i class="fas fa-plus"></i> Создать первую инструкцию
@@ -1197,13 +1572,14 @@
             
             instruction.id = id;
             instruction.updatedAt = new Date().toISOString();
+            instruction.author = currentUser ? currentUser.name : 'Неизвестный';
             
             const index = currentInstructions.findIndex(inst => inst.id === id);
             if (index !== -1) {
                 instruction.createdAt = currentInstructions[index].createdAt;
                 currentInstructions[index] = instruction;
                 
-                if (saveInstructions()) {
+                if (saveUserInstructions()) {
                     renderInstructions();
                     updateStats();
                     showToast('Инструкция обновлена!');
@@ -1216,7 +1592,7 @@
         function deleteInstruction(id) {
             if (confirm('Удалить эту инструкцию?')) {
                 currentInstructions = currentInstructions.filter(inst => inst.id !== id);
-                if (saveInstructions()) {
+                if (saveUserInstructions()) {
                     renderInstructions();
                     updateStats();
                     showToast('Инструкция удалена!');
@@ -1278,10 +1654,11 @@
             
             instruction.createdAt = new Date().toISOString();
             instruction.updatedAt = new Date().toISOString();
+            instruction.author = currentUser ? currentUser.name : 'Неизвестный';
             
             currentInstructions.push(instruction);
             
-            if (saveInstructions()) {
+            if (saveUserInstructions()) {
                 renderInstructions();
                 updateStats();
                 showToast('Новая инструкция создана!');
@@ -1484,7 +1861,13 @@
 
         // ====== АДМИН-ПАНЕЛЬ ======
         function exportData() {
+            if (!currentUser) {
+                showToast('Вы не авторизованы!', 'error');
+                return;
+            }
+            
             const data = {
+                user: currentUser.name,
                 instructions: currentInstructions,
                 exportedAt: new Date().toISOString(),
                 version: '1.0',
@@ -1497,7 +1880,7 @@
             const url = URL.createObjectURL(dataBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `sap-wiki-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `sap-wiki-${currentUser.name}-backup-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1507,6 +1890,11 @@
         }
 
         function importData() {
+            if (!currentUser) {
+                showToast('Вы не авторизованы!', 'error');
+                return;
+            }
+            
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
@@ -1522,7 +1910,7 @@
                         if (data.instructions && Array.isArray(data.instructions)) {
                             if (confirm(`Загрузить ${data.instructions.length} инструкций? Существующие данные будут заменены.`)) {
                                 currentInstructions = data.instructions;
-                                if (saveInstructions()) {
+                                if (saveUserInstructions()) {
                                     renderInstructions();
                                     updateStats();
                                     showToast('Данные успешно загружены!');
@@ -1544,12 +1932,15 @@
         }
 
         function clearAllData() {
-            if (confirm('ВЫ УВЕРЕНЫ? Все инструкции будут удалены без возможности восстановления.')) {
+            if (!currentUser) return;
+            
+            if (confirm('ВЫ УВЕРЕНЫ? Все ваши инструкции будут удалены без возможности восстановления.')) {
                 currentInstructions = [];
-                localStorage.removeItem('sapInstructions');
-                renderInstructions();
-                updateStats();
-                showToast('Все данные очищены!');
+                if (saveUserInstructions()) {
+                    renderInstructions();
+                    updateStats();
+                    showToast('Все данные очищены!');
+                }
             }
         }
 
@@ -1558,7 +1949,8 @@
             infoDiv.style.display = infoDiv.style.display === 'none' ? 'block' : 'none';
             
             if (infoDiv.style.display === 'block') {
-                document.getElementById('dataPath').textContent = 'localStorage/sapInstructions';
+                document.getElementById('dataUser').textContent = currentUser ? currentUser.name : 'Не авторизован';
+                document.getElementById('dataPath').textContent = `localStorage/sapWikiUsers/${currentUser ? currentUser.name : ''}`;
                 const dataSize = JSON.stringify(currentInstructions).length;
                 document.getElementById('dataSize').textContent = `${(dataSize / 1024).toFixed(2)} KB`;
                 document.getElementById('dataCount').textContent = currentInstructions.length;
@@ -1597,7 +1989,7 @@
                     <span style="float: right;">${ppCount}</span>
                 </div>
                 <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.9rem; color: #666;">
-                    <i class="fas fa-info-circle"></i> Данные хранятся в браузере
+                    <i class="fas fa-user"></i> Пользователь: ${currentUser ? currentUser.name : 'Неизвестный'}
                 </div>
             `;
         }
@@ -1685,7 +2077,8 @@
                     <div class="meta">
                         <strong>Модуль:</strong> ${instruction.module} | 
                         <strong>Транзакция:</strong> ${instruction.code || 'не указана'} | 
-                        <strong>Создано:</strong> ${new Date(instruction.createdAt).toLocaleDateString('ru-RU')}
+                        <strong>Создано:</strong> ${new Date(instruction.createdAt).toLocaleDateString('ru-RU')} |
+                        <strong>Автор:</strong> ${instruction.author || 'Неизвестный'}
                     </div>
                     <h2>Описание</h2>
                     <p>${instruction.description || 'Отсутствует'}</p>
@@ -1708,7 +2101,7 @@
                     ` : ''}
                     
                     <div class="footer">
-                        SAP Wiki - Локальная база знаний | 
+                        SAP Wiki - Персональная база знаний | 
                         Распечатано: ${new Date().toLocaleDateString('ru-RU')} ${new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}
                     </div>
                 </body>
