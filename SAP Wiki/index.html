@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAP Wiki - Локальная база знаний</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sap-blue: #0a6ed1;
+            --sap-blue-dark: #0854a0;
+            --sap-blue-light: #e2f0ff;
+            --sap-grey: #f5f6f7;
+            --sap-grey-dark: #6a6d70;
+            --sap-green: #107f3e;
+            --sap-orange: #e7650f;
+            --sap-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: var(--sap-grey);
+            color: #32363a;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--sap-blue) 0%, var(--sap-blue-dark) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(10, 110, 209, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .logo i {
+            color: #ffc107;
+            font-size: 1.8rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--sap-shadow);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .modules h3 {
+            color: var(--sap-blue);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--sap-blue-light);
+        }
+        
+        .module-list {
+            list-style: none;
+        }
+        
+        .module-item {
+            padding: 12px 16px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .module-item:hover {
+            background: var(--sap-blue-light);
+            color: var(--sap-blue);
+            transform: translateX(5px);
+        }
+        
+        .module-item.active {
+            background: var(--sap-blue);
+            color: white;
+        }
+        
+        .module-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--sap-blue-light);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--sap-blue);
+        }
+        
+        .active .module-icon {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        /* Content */
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--sap-shadow);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .page-title {
+            color: var(--sap-blue);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--sap-blue), var(--sap-green));
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(10, 110, 209, 0.15);
+            border-color: var(--sap-blue);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--sap-blue-dark);
+            flex: 1;
+        }
+        
+        .card-badge {
+            background: var(--sap-blue-light);
+            color: var(--sap-blue);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .card-content {
+            color: var(--sap-grey-dark);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            max-height: 100px;
+            overflow: hidden;
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .tag {
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            background: var(--sap-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--sap-blue-dark);
+        }
+        
+        .action-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--sap-grey-dark);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalOpen 0.3s ease;
+        }
+        
+        @keyframes modalOpen {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--sap-blue);
+            box-shadow: 0 0 0 3px rgba(10, 110, 209, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* Tabs in modal */
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .modal-tab.active {
+            color: var(--sap-blue);
+        }
+        
+        .modal-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--sap-blue);
+        }
+        
+        /* Tabs content */
+        .tabs-container {
+            margin: 2rem 0;
+        }
+        
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            white-space: nowrap;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .tab-btn.active {
+            color: var(--sap-blue);
+            border-bottom-color: var(--sap-blue);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem 0;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+        }
+        
+        /* Colors for modules */
+        .mm { background: #0a6ed1; }
+        .fi { background: #107f3e; }
+        .sd { background: #e7650f; }
+        .pp { background: #8b5bb1; }
+        .co { background: #e973bc; }
+        .hr { background: #5899da; }
+        
+        .badge-mm { background: #e2f0ff; color: #0a6ed1; }
+        .badge-fi { background: #e2f6eb; color: #107f3e; }
+        .badge-sd { background: #fef0e6; color: #e7650f; }
+        .badge-pp { background: #f3eef8; color: #8b5bb1; }
+        
+        /* Toast */
+        .toast {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--sap-green);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-book"></i>
+            <span>SAP Wiki - Локальная база знаний</span>
+        </div>
+        
+        <div class="user-menu">
+            <button class="btn" onclick="showModal('newInstructionModal', true)">
+                <i class="fas fa-plus"></i> Новая инструкция
+            </button>
+            <button class="btn" onclick="showModal('adminModal')">
+                <i class="fas fa-cog"></i> Управление
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="modules">
+                <h3><i class="fas fa-layer-group"></i> Модули SAP</h3>
+                <ul class="module-list" id="moduleList">
+                    <!-- Modules loaded by JavaScript -->
+                </ul>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h3><i class="fas fa-chart-line"></i> Статистика</h3>
+                <div id="stats" style="margin-top: 1rem;">
+                    <!-- Stats loaded by JavaScript -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="page-header">
+                <h1 class="page-title" id="pageTitle">Все инструкции</h1>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="searchInput" placeholder="Поиск инструкций..." 
+                           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                    <button class="action-btn" onclick="searchInstructions()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Instruction Cards -->
+            <div class="card-grid" id="instructionsGrid">
+                <!-- Cards loaded by JavaScript -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: New Instruction -->
+    <div id="newInstructionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать новую инструкцию</h2>
+                <button class="close-modal" onclick="hideModal('newInstructionModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="instructionForm">
+                    <div class="form-group">
+                        <label class="form-label">Название инструкции *</label>
+                        <input type="text" class="form-input" id="instructionTitle" 
+                               placeholder="Например: ME21N - Создание заказа на закупку" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Модуль *</label>
+                        <select class="form-select" id="instructionModule" required>
+                            <option value="">Выберите модуль</option>
+                            <option value="MM">MM - Материальный менеджмент</option>
+                            <option value="FI">FI - Финансы</option>
+                            <option value="SD">SD - Продажи и дистрибуция</option>
+                            <option value="PP">PP - Планирование производства</option>
+                            <option value="CO">CO - Контроллинг</option>
+                            <option value="HR">HR - Управление персоналом</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-textarea" id="instructionDescription" 
+                                  placeholder="Краткое описание инструкции..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Теги (через запятую)</label>
+                        <input type="text" class="form-input" id="instructionTags" 
+                               placeholder="ME21N, закупки, материалы">
+                    </div>
+                    
+                    <!-- Tabs for steps and media -->
+                    <div class="modal-tabs">
+                        <button type="button" class="modal-tab active" onclick="showTab('stepsTab')">Шаги</button>
+                        <button type="button" class="modal-tab" onclick="showTab('mediaTab')">Медиа</button>
+                        <button type="button" class="modal-tab" onclick="showTab('codeTab')">Код</button>
+                    </div>
+                    
+                    <!-- Steps Tab -->
+                    <div id="stepsTab" class="tab-content active">
+                        <div class="form-group">
+                            <label class="form-label">Пошаговая инструкция</label>
+                            <textarea class="form-textarea" id="instructionSteps" 
+                                      placeholder="Введите каждый шаг с новой строки..."></textarea>
+                            <small style="color: #666;">Каждый шаг с новой строки</small>
+                        </div>
+                        
+                        <button type="button" class="action-btn secondary" onclick="addStepField()">
+                            <i class="fas fa-plus"></i> Добавить шаг
+                        </button>
+                        
+                        <div id="stepsContainer" style="margin-top: 1rem;"></div>
+                    </div>
+                    
+                    <!-- Media Tab -->
+                    <div id="mediaTab" class="tab-content">
+                        <div class="form-group">
+                            <label class="form-label">Ссылки на изображения или видео</label>
+                            <textarea class="form-textarea" id="instructionMedia" 
+                                      placeholder="Введите ссылки на изображения или видео (каждую с новой строки)..."></textarea>
+                            <small style="color: #666;">Пример: images/me21n-step1.png или https://site.com/video.mp4</small>
+                        </div>
+                        
+                        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.5rem;">Или загрузите локальные файлы:</h4>
+                            <input type="file" id="fileUpload" multiple 
+                                   style="margin-top: 0.5rem;"
+                                   onchange="handleFileUpload(this.files)">
+                            <div id="uploadPreview" style="margin-top: 1rem;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Code Tab -->
+                    <div id="codeTab" class="tab-content">
+                        <div class="form-group">
+                            <label class="form-label">Код транзакции</label>
+                            <input type="text" class="form-input" id="instructionCode" 
+                                   placeholder="Например: ME21N, FB01, VA01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Дополнительные заметки</label>
+                            <textarea class="form-textarea" id="instructionNotes" 
+                                      placeholder="Важные примечания, частые ошибки..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                        <button type="submit" class="action-btn" style="flex: 1;">
+                            <i class="fas fa-save"></i> Сохранить инструкцию
+                        </button>
+                        <button type="button" class="action-btn secondary" onclick="hideModal('newInstructionModal')" style="width: 100px;">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: View Instruction -->
+    <div id="viewInstructionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="viewTitle"></h2>
+                <button class="close-modal" onclick="hideModal('viewInstructionModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+                    <span class="card-badge" id="viewModule"></span>
+                    <span style="color: #666;" id="viewDate"></span>
+                </div>
+                
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="showViewTab('contentTab')">Описание</button>
+                        <button class="tab-btn" onclick="showViewTab('stepsTab')">Шаги</button>
+                        <button class="tab-btn" onclick="showViewTab('mediaTab')">Медиа</button>
+                        <button class="tab-btn" onclick="showViewTab('notesTab')">Заметки</button>
+                    </div>
+                    
+                    <div id="viewContentTab" class="tab-content active">
+                        <p id="viewDescription"></p>
+                    </div>
+                    
+                    <div id="viewStepsTab" class="tab-content">
+                        <div id="viewSteps"></div>
+                    </div>
+                    
+                    <div id="viewMediaTab" class="tab-content">
+                        <div id="viewMedia"></div>
+                    </div>
+                    
+                    <div id="viewNotesTab" class="tab-content">
+                        <div id="viewNotes"></div>
+                    </div>
+                </div>
+                
+                <div class="card-tags" id="viewTags" style="margin-top: 2rem;"></div>
+            </div>
+            <div class="modal-header" style="justify-content: flex-end;">
+                <button class="action-btn secondary" onclick="editCurrentInstruction()">
+                    <i class="fas fa-edit"></i> Редактировать
+                </button>
+                <button class="action-btn" onclick="printInstruction()" style="margin-left: 10px;">
+                    <i class="fas fa-print"></i> Печать
+                </button>
+                <button class="action-btn secondary" onclick="deleteCurrentInstruction()" style="margin-left: 10px; background: #dc3545; color: white;">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Admin Panel -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Управление базой знаний</h2>
+                <button class="close-modal" onclick="hideModal('adminModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                    <div class="card" onclick="exportData()" style="cursor: pointer; text-align: center;">
+                        <div style="font-size: 3rem; color: var(--sap-green); margin-bottom: 1rem;">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h3>Экспорт данных</h3>
+                        <p>Скачайте все инструкции в файл</p>
+                    </div>
+                    
+                    <div class="card" onclick="importData()" style="cursor: pointer; text-align: center;">
+                        <div style="font-size: 3rem; color: var(--sap-blue); margin-bottom: 1rem;">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <h3>Импорт данных</h3>
+                        <p>Загрузите инструкции из файла</p>
+                    </div>
+                    
+                    <div class="card" onclick="clearAllData()" style="cursor: pointer; text-align: center;">
+                        <div style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                        <h3>Очистить все</h3>
+                        <p>Удалить все инструкции</p>
+                    </div>
+                    
+                    <div class="card" onclick="showBackupInfo()" style="cursor: pointer; text-align: center;">
+                        <div style="font-size: 3rem; color: var(--sap-orange); margin-bottom: 1rem;">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3>Информация</h3>
+                        <p>О системе и данных</p>
+                    </div>
+                </div>
+                
+                <div id="backupInfo" style="display: none; margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+                    <h3>О локальном хранении данных</h3>
+                    <p>Все данные хранятся в вашем браузере (localStorage).</p>
+                    <p><strong>Путь к данным:</strong> <code id="dataPath"></code></p>
+                    <p><strong>Размер данных:</strong> <span id="dataSize"></span></p>
+                    <p><strong>Количество инструкций:</strong> <span id="dataCount"></span></p>
+                    <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Для сохранения на другой компьютер используйте экспорт/импорт
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">Сохранено успешно!</span>
+        </div>
+    </div>
+
+    <script>
+        // ====== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ======
+        let currentInstructions = [];
+        let currentModule = 'all';
+        let editingId = null;
+        let stepsCounter = 1;
+
+        // ====== ИНИЦИАЛИЗАЦИЯ ======
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('SAP Wiki инициализирован');
+            loadInstructions();
+            setupEventListeners();
+            updateStats();
+            
+            // Показать приветственное сообщение
+            setTimeout(() => {
+                if (currentInstructions.length === 0) {
+                    showToast('Добро пожаловать в SAP Wiki! Создайте первую инструкцию.');
+                }
+            }, 1000);
+        });
+
+        // ====== ХРАНЕНИЕ ДАННЫХ ======
+        function saveInstructions() {
+            try {
+                localStorage.setItem('sapInstructions', JSON.stringify(currentInstructions));
+                console.log('Данные сохранены:', currentInstructions.length, 'инструкций');
+                return true;
+            } catch (e) {
+                console.error('Ошибка сохранения:', e);
+                showToast('Ошибка сохранения данных!', 'error');
+                return false;
+            }
+        }
+
+        function loadInstructions() {
+            try {
+                const saved = localStorage.getItem('sapInstructions');
+                if (saved) {
+                    currentInstructions = JSON.parse(saved);
+                    console.log('Данные загружены:', currentInstructions.length, 'инструкций');
+                } else {
+                    // Создаем примеры инструкций
+                    currentInstructions = [
+                        {
+                            id: 1,
+                            title: "ME21N - Создание заказа на закупку",
+                            module: "MM",
+                            description: "Пошаговая инструкция по созданию заказа на закупку материалов или услуг.",
+                            tags: ["закупки", "ME21N", "материалы"],
+                            steps: [
+                                "1. Войти в транзакцию ME21N",
+                                "2. Выбрать тип заказа NB",
+                                "3. Ввести данные поставщика",
+                                "4. Добавить позиции материалов",
+                                "5. Проверить и сохранить"
+                            ],
+                            media: [
+                                { type: 'image', url: 'https://via.placeholder.com/600x400/0a6ed1/ffffff?text=ME21N+Шаг+1' },
+                                { type: 'image', url: 'https://via.placeholder.com/600x400/107f3e/ffffff?text=ME21N+Шаг+2' }
+                            ],
+                            code: "ME21N",
+                            notes: "Проверяйте наличие материалов перед созданием заказа.",
+                            createdAt: "2024-01-15T10:00:00.000Z",
+                            updatedAt: "2024-01-15T10:00:00.000Z"
+                        },
+                        {
+                            id: 2,
+                            title: "FB01 - Проведение документа в FI",
+                            module: "FI",
+                            description: "Инструкция по проведению финансового документа.",
+                            tags: ["финансы", "FB01", "документ"],
+                            steps: [
+                                "1. Открыть транзакцию FB01",
+                                "2. Выбрать тип документа",
+                                "3. Заполнить проводки",
+                                "4. Ввести сумму",
+                                "5. Сохранить документ"
+                            ],
+                            media: [],
+                            code: "FB01",
+                            notes: "Внимательно проверяйте счета и суммы.",
+                            createdAt: "2024-01-15T11:00:00.000Z",
+                            updatedAt: "2024-01-15T11:00:00.000Z"
+                        }
+                    ];
+                    saveInstructions();
+                }
+                
+                renderInstructions();
+                renderModules();
+                updateEmptyState();
+                
+            } catch (e) {
+                console.error('Ошибка загрузки данных:', e);
+                showToast('Ошибка загрузки данных!', 'error');
+                currentInstructions = [];
+            }
+        }
+
+        // ====== ОТОБРАЖЕНИЕ ДАННЫХ ======
+        function renderInstructions() {
+            const grid = document.getElementById('instructionsGrid');
+            if (!grid) return;
+            
+            let filtered = currentInstructions;
+            
+            if (currentModule !== 'all') {
+                filtered = filtered.filter(inst => inst.module === currentModule);
+            }
+            
+            if (filtered.length === 0) {
+                updateEmptyState();
+                return;
+            }
+            
+            filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            
+            grid.innerHTML = filtered.map(instruction => `
+                <div class="card" data-id="${instruction.id}">
+                    <div class="card-header">
+                        <h3 class="card-title">${instruction.title}</h3>
+                        <span class="card-badge badge-${instruction.module.toLowerCase()}">
+                            ${instruction.module}
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        ${instruction.description || 'Описание отсутствует'}
+                    </div>
+                    <div class="card-tags">
+                        ${instruction.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="viewInstruction(${instruction.id})">
+                            <i class="fas fa-eye"></i> Просмотр
+                        </button>
+                        <button class="action-btn secondary" onclick="editInstruction(${instruction.id})">
+                            <i class="fas fa-edit"></i> Редактировать
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateEmptyState() {
+            const grid = document.getElementById('instructionsGrid');
+            const emptyState = `
+                <div class="empty-state">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Инструкций пока нет</h3>
+                    <p>Создайте свою первую инструкцию</p>
+                    <button class="action-btn" onclick="showModal('newInstructionModal', true)" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Создать первую инструкцию
+                    </button>
+                </div>
+            `;
+            
+            if (currentInstructions.length === 0 || 
+                (currentModule !== 'all' && currentInstructions.filter(i => i.module === currentModule).length === 0)) {
+                grid.innerHTML = emptyState;
+            }
+        }
+
+        function renderModules() {
+            const moduleList = document.getElementById('moduleList');
+            const modules = [
+                { id: 'all', name: 'Все модули', icon: 'fa-layer-group' },
+                { id: 'MM', name: 'Закупки (MM)', icon: 'fa-shopping-cart' },
+                { id: 'FI', name: 'Финансы (FI)', icon: 'fa-chart-line' },
+                { id: 'SD', name: 'Продажи (SD)', icon: 'fa-truck' },
+                { id: 'PP', name: 'Производство (PP)', icon: 'fa-industry' },
+                { id: 'CO', name: 'Контроллинг (CO)', icon: 'fa-calculator' },
+                { id: 'HR', name: 'Кадры (HR)', icon: 'fa-users' }
+            ];
+            
+            moduleList.innerHTML = modules.map(module => `
+                <li class="module-item ${currentModule === module.id ? 'active' : ''}" 
+                    onclick="filterByModule('${module.id}')">
+                    <div class="module-icon ${module.id.toLowerCase()}">
+                        <i class="fas ${module.icon}"></i>
+                    </div>
+                    <span>${module.name}</span>
+                </li>
+            `).join('');
+            
+            document.getElementById('pageTitle').textContent = 
+                modules.find(m => m.id === currentModule)?.name || 'Все инструкции';
+        }
+
+        // ====== ФИЛЬТРАЦИЯ И ПОИСК ======
+        function filterByModule(moduleId) {
+            currentModule = moduleId;
+            renderInstructions();
+            renderModules();
+        }
+
+        function searchInstructions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm.trim()) {
+                renderInstructions();
+                return;
+            }
+            
+            const filtered = currentInstructions.filter(instruction => 
+                instruction.title.toLowerCase().includes(searchTerm) ||
+                instruction.description.toLowerCase().includes(searchTerm) ||
+                instruction.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+                (instruction.code && instruction.code.toLowerCase().includes(searchTerm))
+            );
+            
+            const grid = document.getElementById('instructionsGrid');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте другой поисковый запрос</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = filtered.map(instruction => `
+                <div class="card" data-id="${instruction.id}">
+                    <div class="card-header">
+                        <h3 class="card-title">${instruction.title}</h3>
+                        <span class="card-badge badge-${instruction.module.toLowerCase()}">
+                            ${instruction.module}
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        ${instruction.description || 'Описание отсутствует'}
+                    </div>
+                    <div class="card-tags">
+                        ${instruction.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="viewInstruction(${instruction.id})">
+                            <i class="fas fa-eye"></i> Просмотр
+                        </button>
+                        <button class="action-btn secondary" onclick="editInstruction(${instruction.id})">
+                            <i class="fas fa-edit"></i> Редактировать
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ====== CRUD ОПЕРАЦИИ ======
+        function viewInstruction(id) {
+            const instruction = currentInstructions.find(inst => inst.id === id);
+            if (!instruction) {
+                showToast('Инструкция не найдена!', 'error');
+                return;
+            }
+            
+            document.getElementById('viewTitle').textContent = instruction.title;
+            document.getElementById('viewModule').textContent = instruction.module;
+            document.getElementById('viewModule').className = `card-badge badge-${instruction.module.toLowerCase()}`;
+            document.getElementById('viewDate').textContent = `Создано: ${new Date(instruction.createdAt).toLocaleDateString('ru-RU')}`;
+            document.getElementById('viewDescription').textContent = instruction.description || 'Описание отсутствует';
+            
+            // Шаги
+            const stepsHtml = instruction.steps && instruction.steps.length > 0 
+                ? `<ol style="margin-left: 1.5rem;">${instruction.steps.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}</ol>`
+                : '<p style="color: #666;">Шаги не указаны</p>';
+            document.getElementById('viewSteps').innerHTML = stepsHtml;
+            
+            // Медиа
+            let mediaHtml = '';
+            if (instruction.media && instruction.media.length > 0) {
+                instruction.media.forEach((media, index) => {
+                    if (media.type === 'image') {
+                        mediaHtml += `
+                            <div style="margin-bottom: 1.5rem;">
+                                <img src="${media.url}" 
+                                     style="max-width: 100%; border-radius: 6px; border: 1px solid #ddd;"
+                                     alt="Изображение ${index + 1}">
+                                <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                                    ${media.url}
+                                </div>
+                            </div>
+                        `;
+                    } else if (media.type === 'video') {
+                        mediaHtml += `
+                            <div style="margin-bottom: 1.5rem;">
+                                <video controls style="max-width: 100%; border-radius: 6px; border: 1px solid #ddd;">
+                                    <source src="${media.url}" type="video/mp4">
+                                    Ваш браузер не поддерживает видео.
+                                </video>
+                                <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                                    ${media.url}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        mediaHtml += `
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #f5f6f7; border-radius: 6px;">
+                                <i class="fas fa-link"></i> 
+                                <a href="${media.url}" target="_blank" style="margin-left: 0.5rem;">${media.url}</a>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                mediaHtml = '<p style="color: #666;">Медиафайлы отсутствуют</p>';
+            }
+            document.getElementById('viewMedia').innerHTML = mediaHtml;
+            
+            // Заметки
+            document.getElementById('viewNotes').textContent = instruction.notes || 'Заметки отсутствуют';
+            
+            // Теги
+            const tagsHtml = instruction.tags && instruction.tags.length > 0
+                ? instruction.tags.map(tag => `<span class="tag">${tag}</span>`).join('')
+                : '<p style="color: #666;">Теги не указаны</p>';
+            document.getElementById('viewTags').innerHTML = tagsHtml;
+            
+            editingId = id;
+            
+            // Сбросить и показать первую вкладку
+            showViewTab('contentTab', true);
+            
+            showModal('viewInstructionModal');
+        }
+
+        function editCurrentInstruction() {
+            if (!editingId) return;
+            hideModal('viewInstructionModal');
+            setTimeout(() => editInstruction(editingId), 300);
+        }
+
+        function deleteCurrentInstruction() {
+            if (!editingId) return;
+            if (confirm('Вы уверены, что хотите удалить эту инструкцию?')) {
+                deleteInstruction(editingId);
+                hideModal('viewInstructionModal');
+            }
+        }
+
+        function editInstruction(id) {
+            const instruction = currentInstructions.find(inst => inst.id === id);
+            if (!instruction) {
+                showToast('Инструкция не найдена!', 'error');
+                return;
+            }
+            
+            editingId = id;
+            
+            // Заполнить форму
+            document.getElementById('instructionTitle').value = instruction.title;
+            document.getElementById('instructionModule').value = instruction.module;
+            document.getElementById('instructionDescription').value = instruction.description || '';
+            document.getElementById('instructionTags').value = instruction.tags ? instruction.tags.join(', ') : '';
+            document.getElementById('instructionSteps').value = instruction.steps ? instruction.steps.join('\n') : '';
+            document.getElementById('instructionCode').value = instruction.code || '';
+            document.getElementById('instructionNotes').value = instruction.notes || '';
+            document.getElementById('instructionMedia').value = instruction.media 
+                ? instruction.media.map(m => m.url).join('\n') 
+                : '';
+            
+            // Изменить заголовок
+            document.querySelector('#newInstructionModal .modal-header h2').textContent = 'Редактировать инструкцию';
+            
+            // Установить обработчик
+            const form = document.getElementById('instructionForm');
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                updateInstruction(id);
+            };
+            
+            showModal('newInstructionModal');
+        }
+
+        function updateInstruction(id) {
+            const instruction = getFormData();
+            
+            // Получить медиа из формы
+            const mediaText = document.getElementById('instructionMedia').value;
+            if (mediaText.trim()) {
+                instruction.media = mediaText.split('\n')
+                    .map(url => url.trim())
+                    .filter(url => url !== '')
+                    .map(url => ({
+                        type: detectMediaType(url),
+                        url: url
+                    }));
+            }
+            
+            instruction.id = id;
+            instruction.updatedAt = new Date().toISOString();
+            
+            const index = currentInstructions.findIndex(inst => inst.id === id);
+            if (index !== -1) {
+                instruction.createdAt = currentInstructions[index].createdAt;
+                currentInstructions[index] = instruction;
+                
+                if (saveInstructions()) {
+                    renderInstructions();
+                    updateStats();
+                    showToast('Инструкция обновлена!');
+                    hideModal('newInstructionModal');
+                    resetForm();
+                }
+            }
+        }
+
+        function deleteInstruction(id) {
+            if (confirm('Удалить эту инструкцию?')) {
+                currentInstructions = currentInstructions.filter(inst => inst.id !== id);
+                if (saveInstructions()) {
+                    renderInstructions();
+                    updateStats();
+                    showToast('Инструкция удалена!');
+                }
+            }
+        }
+
+        // ====== СОЗДАНИЕ НОВОЙ ИНСТРУКЦИИ ======
+        function setupEventListeners() {
+            const form = document.getElementById('instructionForm');
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                createNewInstruction();
+            };
+            
+            // Поиск при вводе
+            document.getElementById('searchInput').addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    renderInstructions();
+                }
+            });
+            
+            // Закрытие модальных окон
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        hideModal(this.id);
+                    }
+                });
+            });
+            
+            // Закрытие по ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideAllModals();
+                }
+            });
+        }
+
+        function createNewInstruction() {
+            const instruction = getFormData();
+            
+            // Получить медиа из формы
+            const mediaText = document.getElementById('instructionMedia').value;
+            if (mediaText.trim()) {
+                instruction.media = mediaText.split('\n')
+                    .map(url => url.trim())
+                    .filter(url => url !== '')
+                    .map(url => ({
+                        type: detectMediaType(url),
+                        url: url
+                    }));
+            }
+            
+            // Генерация ID
+            instruction.id = currentInstructions.length > 0 
+                ? Math.max(...currentInstructions.map(inst => inst.id)) + 1 
+                : 1;
+            
+            instruction.createdAt = new Date().toISOString();
+            instruction.updatedAt = new Date().toISOString();
+            
+            currentInstructions.push(instruction);
+            
+            if (saveInstructions()) {
+                renderInstructions();
+                updateStats();
+                showToast('Новая инструкция создана!');
+                hideModal('newInstructionModal');
+                resetForm();
+            }
+        }
+
+        function getFormData() {
+            const tags = document.getElementById('instructionTags').value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag !== '');
+            
+            const steps = document.getElementById('instructionSteps').value
+                .split('\n')
+                .map(step => step.trim())
+                .filter(step => step !== '');
+            
+            return {
+                title: document.getElementById('instructionTitle').value,
+                module: document.getElementById('instructionModule').value,
+                description: document.getElementById('instructionDescription').value,
+                tags: tags,
+                steps: steps,
+                code: document.getElementById('instructionCode').value,
+                notes: document.getElementById('instructionNotes').value,
+                media: []
+            };
+        }
+
+        function detectMediaType(url) {
+            if (url.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) return 'image';
+            if (url.match(/\.(mp4|webm|ogg|avi|mov)$/i)) return 'video';
+            if (url.match(/^https?:\/\//)) return 'link';
+            return 'file';
+        }
+
+        // ====== УПРАВЛЕНИЕ ФОРМОЙ ======
+        function resetForm() {
+            // Очистить все поля
+            document.getElementById('instructionForm').reset();
+            document.getElementById('instructionTitle').value = '';
+            document.getElementById('instructionModule').selectedIndex = 0;
+            document.getElementById('instructionDescription').value = '';
+            document.getElementById('instructionTags').value = '';
+            document.getElementById('instructionSteps').value = '';
+            document.getElementById('instructionMedia').value = '';
+            document.getElementById('instructionCode').value = '';
+            document.getElementById('instructionNotes').value = '';
+            document.getElementById('stepsContainer').innerHTML = '';
+            document.getElementById('uploadPreview').innerHTML = '';
+            document.getElementById('fileUpload').value = '';
+            
+            stepsCounter = 1;
+            editingId = null;
+            
+            // Вернуть оригинальный заголовок
+            document.querySelector('#newInstructionModal .modal-header h2').textContent = 'Создать новую инструкцию';
+            
+            // Вернуть оригинальный обработчик
+            document.getElementById('instructionForm').onsubmit = function(e) {
+                e.preventDefault();
+                createNewInstruction();
+            };
+            
+            // Показать первую вкладку
+            showTab('stepsTab', true);
+        }
+
+        function addStepField() {
+            const container = document.getElementById('stepsContainer');
+            const stepId = 'step_' + stepsCounter++;
+            
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'form-group';
+            stepDiv.style.display = 'flex';
+            stepDiv.style.gap = '10px';
+            stepDiv.style.alignItems = 'center';
+            
+            stepDiv.innerHTML = `
+                <input type="text" class="form-input" placeholder="Шаг ${stepsCounter - 1}" 
+                       style="flex: 1;" id="${stepId}">
+                <button type="button" class="action-btn secondary" 
+                        onclick="this.parentElement.remove()" style="width: 40px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(stepDiv);
+        }
+
+        function handleFileUpload(files) {
+            const preview = document.getElementById('uploadPreview');
+            preview.innerHTML = '';
+            
+            Array.from(files).slice(0, 5).forEach(file => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const fileType = file.type.startsWith('image/') ? 'image' : 
+                                   file.type.startsWith('video/') ? 'video' : 'file';
+                    
+                    const previewItem = document.createElement('div');
+                    previewItem.style.marginBottom = '10px';
+                    previewItem.style.padding = '10px';
+                    previewItem.style.background = '#f8f9fa';
+                    previewItem.style.borderRadius = '6px';
+                    previewItem.style.display = 'flex';
+                    previewItem.style.alignItems = 'center';
+                    previewItem.style.gap = '10px';
+                    
+                    if (fileType === 'image') {
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            <div>
+                                <div style="font-weight: 500;">${file.name}</div>
+                                <div style="font-size: 0.85rem; color: #666;">${(file.size / 1024).toFixed(1)} KB</div>
+                            </div>
+                        `;
+                    } else if (fileType === 'video') {
+                        previewItem.innerHTML = `
+                            <i class="fas fa-video" style="font-size: 2rem; color: #666;"></i>
+                            <div>
+                                <div style="font-weight: 500;">${file.name}</div>
+                                <div style="font-size: 0.85rem; color: #666;">${(file.size / 1024).toFixed(1)} KB</div>
+                            </div>
+                        `;
+                    } else {
+                        previewItem.innerHTML = `
+                            <i class="fas fa-file" style="font-size: 2rem; color: #666;"></i>
+                            <div>
+                                <div style="font-weight: 500;">${file.name}</div>
+                                <div style="font-size: 0.85rem; color: #666;">${(file.size / 1024).toFixed(1)} KB</div>
+                            </div>
+                        `;
+                    }
+                    
+                    preview.appendChild(previewItem);
+                    
+                    // Добавить ссылку в поле медиа
+                    const mediaField = document.getElementById('instructionMedia');
+                    const currentValue = mediaField.value.trim();
+                    const fileName = file.name;
+                    mediaField.value = currentValue ? currentValue + '\n' + fileName : fileName;
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ====== УПРАВЛЕНИЕ ВКЛАДКАМИ ======
+        function showTab(tabId, force = false) {
+            if (!force && event) event.preventDefault();
+            
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активный класс со всех кнопок
+            document.querySelectorAll('.modal-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(tabId).classList.add('active');
+            
+            // Активировать кнопку
+            if (!force && event) {
+                event.target.classList.add('active');
+            } else {
+                document.querySelector(`.modal-tab[onclick*="${tabId}"]`).classList.add('active');
+            }
+        }
+
+        function showViewTab(tabId, force = false) {
+            if (!force && event) event.preventDefault();
+            
+            // Скрыть все вкладки
+            document.querySelectorAll('#viewInstructionModal .tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активный класс со всех кнопок
+            document.querySelectorAll('#viewInstructionModal .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById('view' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
+            
+            // Активировать кнопку
+            if (!force && event) {
+                event.target.classList.add('active');
+            } else {
+                document.querySelector(`#viewInstructionModal .tab-btn[onclick*="${tabId}"]`).classList.add('active');
+            }
+        }
+
+        // ====== АДМИН-ПАНЕЛЬ ======
+        function exportData() {
+            const data = {
+                instructions: currentInstructions,
+                exportedAt: new Date().toISOString(),
+                version: '1.0',
+                count: currentInstructions.length
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sap-wiki-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Данные экспортированы в файл!');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (data.instructions && Array.isArray(data.instructions)) {
+                            if (confirm(`Загрузить ${data.instructions.length} инструкций? Существующие данные будут заменены.`)) {
+                                currentInstructions = data.instructions;
+                                if (saveInstructions()) {
+                                    renderInstructions();
+                                    updateStats();
+                                    showToast('Данные успешно загружены!');
+                                }
+                            }
+                        } else {
+                            showToast('Некорректный формат файла!', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Ошибка при чтении файла!', 'error');
+                        console.error('Import error:', err);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('ВЫ УВЕРЕНЫ? Все инструкции будут удалены без возможности восстановления.')) {
+                currentInstructions = [];
+                localStorage.removeItem('sapInstructions');
+                renderInstructions();
+                updateStats();
+                showToast('Все данные очищены!');
+            }
+        }
+
+        function showBackupInfo() {
+            const infoDiv = document.getElementById('backupInfo');
+            infoDiv.style.display = infoDiv.style.display === 'none' ? 'block' : 'none';
+            
+            if (infoDiv.style.display === 'block') {
+                document.getElementById('dataPath').textContent = 'localStorage/sapInstructions';
+                const dataSize = JSON.stringify(currentInstructions).length;
+                document.getElementById('dataSize').textContent = `${(dataSize / 1024).toFixed(2)} KB`;
+                document.getElementById('dataCount').textContent = currentInstructions.length;
+            }
+        }
+
+        function updateStats() {
+            const statsDiv = document.getElementById('stats');
+            if (!statsDiv) return;
+            
+            const mmCount = currentInstructions.filter(inst => inst.module === 'MM').length;
+            const fiCount = currentInstructions.filter(inst => inst.module === 'FI').length;
+            const sdCount = currentInstructions.filter(inst => inst.module === 'SD').length;
+            const ppCount = currentInstructions.filter(inst => inst.module === 'PP').length;
+            const totalCount = currentInstructions.length;
+            
+            statsDiv.innerHTML = `
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: var(--sap-blue); font-weight: 500;">Всего:</span> 
+                    <span style="float: right;">${totalCount}</span>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #0a6ed1;">MM:</span> 
+                    <span style="float: right;">${mmCount}</span>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #107f3e;">FI:</span> 
+                    <span style="float: right;">${fiCount}</span>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #e7650f;">SD:</span> 
+                    <span style="float: right;">${sdCount}</span>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #8b5bb1;">PP:</span> 
+                    <span style="float: right;">${ppCount}</span>
+                </div>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.9rem; color: #666;">
+                    <i class="fas fa-info-circle"></i> Данные хранятся в браузере
+                </div>
+            `;
+        }
+
+        // ====== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======
+        function showModal(modalId, reset = false) {
+            if (reset && modalId === 'newInstructionModal') {
+                resetForm();
+            }
+            
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function hideAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.body.style.overflow = 'auto';
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const messageEl = document.getElementById('toastMessage');
+            
+            messageEl.textContent = message;
+            
+            // Изменить цвет в зависимости от типа
+            if (type === 'error') {
+                toast.style.background = '#dc3545';
+            } else if (type === 'warning') {
+                toast.style.background = '#ffc107';
+            } else {
+                toast.style.background = 'var(--sap-green)';
+            }
+            
+            toast.style.display = 'block';
+            
+            // Анимация
+            toast.style.animation = 'none';
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease';
+            }, 10);
+            
+            // Скрыть через 3 секунды
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
+        function printInstruction() {
+            if (!editingId) return;
+            
+            const instruction = currentInstructions.find(inst => inst.id === editingId);
+            if (!instruction) return;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${instruction.title}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 2cm; }
+                        h1 { color: #0a6ed1; border-bottom: 2px solid #0a6ed1; padding-bottom: 10px; }
+                        .meta { color: #666; margin-bottom: 2rem; padding: 10px; background: #f5f6f7; border-radius: 4px; }
+                        .steps { margin-left: 1.5rem; }
+                        .tag { display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 2px; border-radius: 10px; font-size: 0.9rem; }
+                        .footer { margin-top: 3rem; font-size: 0.9rem; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 1rem; }
+                        @media print {
+                            body { margin: 1cm; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>${instruction.title}</h1>
+                    <div class="meta">
+                        <strong>Модуль:</strong> ${instruction.module} | 
+                        <strong>Транзакция:</strong> ${instruction.code || 'не указана'} | 
+                        <strong>Создано:</strong> ${new Date(instruction.createdAt).toLocaleDateString('ru-RU')}
+                    </div>
+                    <h2>Описание</h2>
+                    <p>${instruction.description || 'Отсутствует'}</p>
+                    
+                    ${instruction.steps && instruction.steps.length > 0 ? `
+                        <h2>Шаги выполнения</h2>
+                        <ol class="steps">
+                            ${instruction.steps.map(step => `<li>${step}</li>`).join('')}
+                        </ol>
+                    ` : ''}
+                    
+                    ${instruction.notes ? `
+                        <h2>Заметки</h2>
+                        <p>${instruction.notes}</p>
+                    ` : ''}
+                    
+                    ${instruction.tags && instruction.tags.length > 0 ? `
+                        <h2>Теги</h2>
+                        <div>${instruction.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+                    ` : ''}
+                    
+                    <div class="footer">
+                        SAP Wiki - Локальная база знаний | 
+                        Распечатано: ${new Date().toLocaleDateString('ru-RU')} ${new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            setTimeout(() => {
+                printWindow.print();
+                // printWindow.close();
+            }, 500);
+        }
+    </script>
+</body>
+</html>
