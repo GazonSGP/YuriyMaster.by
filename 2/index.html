@@ -66,11 +66,6 @@
             100% { transform: scale(1); }
         }
 
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
         /* Header */
         .header {
             grid-column: 1 / -1;
@@ -743,69 +738,6 @@
             font-size: 14px;
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                position: static;
-                margin-bottom: 20px;
-            }
-            
-            .cards-grid {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            
-            .search-section {
-                flex-direction: column;
-            }
-            
-            .search-box, .filter-select {
-                min-width: 100%;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .ai-panel {
-                width: calc(100vw - 60px);
-                right: -15px;
-            }
-        }
-
-        /* Loader */
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--sap-gray-light);
-            border-top: 3px solid var(--sap-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Export/Import */
-        .data-actions {
-            display: flex;
-            gap: 10px;
-        }
-
         /* Welcome Screen */
         .welcome-screen {
             position: fixed;
@@ -865,34 +797,60 @@
             border-color: var(--sap-blue);
         }
 
-        /* Tutorial Highlight */
-        .tutorial-highlight {
-            position: relative;
-            animation: pulse 1.5s infinite;
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--sap-gray-light);
+            border-top: 3px solid var(--sap-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        .tutorial-highlight::after {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border: 2px solid var(--sap-orange);
-            border-radius: var(--radius);
-            pointer-events: none;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Print Styles */
-        @media print {
-            .sidebar, .search-section, .card-footer, .ai-assistant {
-                display: none !important;
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
             }
             
-            .card {
-                break-inside: avoid;
-                box-shadow: none !important;
-                border: 1px solid #ddd !important;
+            .sidebar {
+                position: static;
+                margin-bottom: 20px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .search-section {
+                flex-direction: column;
+            }
+            
+            .search-box, .filter-select {
+                min-width: 100%;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-panel {
+                width: calc(100vw - 60px);
+                right: -15px;
             }
         }
     </style>
@@ -1073,7 +1031,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="instructionForm" onsubmit="saveInstruction(event)">
+                <form id="instructionForm">
                     <input type="hidden" id="instructionId">
                     
                     <div class="form-group">
@@ -1147,4 +1105,1287 @@
                 <button type="button" class="btn btn-success" onclick="saveInstruction()">
                     <i class="fas fa-save"></i> Сохранить
                 </button>
-                <button type="button" class="btn btn-primary" id="aiGenerateBtn"
+                <button type="button" class="btn btn-primary" id="aiGenerateBtn" onclick="generateWithAI()">
+                    <i class="fas fa-robot"></i> AI Генерация
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Menu -->
+    <div id="userMenu" class="modal" style="align-items: flex-start; justify-content: flex-end; padding-top: 80px;">
+        <div class="modal-content" style="max-width: 300px; margin: 0 20px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Настройки</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Имя пользователя</label>
+                    <input type="text" id="changeUserName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Автосохранение</label>
+                    <select id="autoSave" class="form-control">
+                        <option value="true">Включено</option>
+                        <option value="false">Выключено</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Тема</label>
+                    <select id="themeSelect" class="form-control">
+                        <option value="light">Светлая</option>
+                        <option value="dark">Темная</option>
+                        <option value="fiori">SAP Fiori</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="clearUserData()">
+                    <i class="fas fa-trash"></i> Очистить мои данные
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="hideUserMenu()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // ===================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====================
+        let currentUser = null;
+        let instructions = [];
+        let currentSection = 'all';
+        let currentFilter = '';
+        let aiPanelVisible = false;
+
+        // Модули SAP с иконками
+        const sapModules = [
+            { id: 'FI', name: 'Финансы (FI)', icon: 'fa-coins', color: '#4CAF50' },
+            { id: 'CO', name: 'Контроллинг (CO)', icon: 'fa-chart-line', color: '#2196F3' },
+            { id: 'MM', name: 'Материалы (MM)', icon: 'fa-boxes', color: '#FF9800' },
+            { id: 'SD', name: 'Продажи (SD)', icon: 'fa-shopping-cart', color: '#E91E63' },
+            { id: 'PP', name: 'Производство (PP)', icon: 'fa-industry', color: '#9C27B0' },
+            { id: 'QM', name: 'Качество (QM)', icon: 'fa-check-double', color: '#009688' },
+            { id: 'PM', name: 'Обслуживание (PM)', icon: 'fa-tools', color: '#795548' },
+            { id: 'HR', name: 'Кадры (HR)', icon: 'fa-users', color: '#3F51B5' },
+            { id: 'PS', name: 'Проекты (PS)', icon: 'fa-project-diagram', color: '#00BCD4' },
+            { id: 'WM', name: 'Склад (WM)', icon: 'fa-warehouse', color: '#8BC34A' },
+            { id: 'BASIS', name: 'Базис (BASIS)', icon: 'fa-server', color: '#607D8B' }
+        ];
+
+        // ===================== ИНИЦИАЛИЗАЦИЯ =====================
+        function initializeApp() {
+            console.log('Initializing app...');
+            
+            // Проверяем, есть ли сохраненный пользователь
+            const savedUser = localStorage.getItem('sapAssistantUser');
+            console.log('Saved user from localStorage:', savedUser);
+            
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    console.log('Parsed user:', currentUser);
+                    startApplication();
+                } catch (error) {
+                    console.error('Error parsing saved user:', error);
+                    // Если ошибка парсинга, показываем welcome screen
+                    showWelcomeScreen();
+                }
+            } else {
+                showWelcomeScreen();
+            }
+        }
+
+        function showWelcomeScreen() {
+            // Показываем welcome screen
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const app = document.getElementById('app');
+            
+            if (welcomeScreen && app) {
+                welcomeScreen.style.display = 'flex';
+                app.style.display = 'none';
+                
+                // Фокус на поле ввода
+                const userNameInput = document.getElementById('userNameInput');
+                if (userNameInput) {
+                    userNameInput.focus();
+                    
+                    // Обработка нажатия Enter в поле ввода
+                    userNameInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            console.log('Enter pressed in username input');
+                            startWithUserName();
+                        }
+                    });
+                }
+                
+                // Обработка клика на кнопку старта
+                const startButton = document.getElementById('startButton');
+                if (startButton) {
+                    startButton.addEventListener('click', startWithUserName);
+                }
+                
+                console.log('Welcome screen shown');
+            } else {
+                console.error('Welcome screen elements not found!');
+            }
+        }
+
+        function startWithUserName() {
+            console.log('startWithUserName called');
+            
+            const userName = document.getElementById('userNameInput').value.trim();
+            
+            console.log('Start button clicked, username:', userName);
+            
+            if (!userName) {
+                showNotification('Введите ваше имя', 'error');
+                document.getElementById('userNameInput').focus();
+                return;
+            }
+            
+            // Создаем пользователя
+            currentUser = {
+                id: generateId(),
+                name: userName,
+                avatar: userName.charAt(0).toUpperCase(),
+                createdAt: new Date().toISOString(),
+                settings: {
+                    autoSave: true,
+                    theme: 'light',
+                    tutorialCompleted: false
+                }
+            };
+            
+            console.log('Created user:', currentUser);
+            
+            // Сохраняем пользователя
+            localStorage.setItem('sapAssistantUser', JSON.stringify(currentUser));
+            console.log('User saved to localStorage');
+            
+            // Создаем хранилище для пользователя
+            initializeUserStorage();
+            
+            startApplication();
+        }
+
+        function startApplication() {
+            console.log('Starting application...');
+            
+            // Скрываем welcome screen
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const app = document.getElementById('app');
+            
+            if (!welcomeScreen || !app) {
+                console.error('Elements not found!');
+                return;
+            }
+            
+            welcomeScreen.style.display = 'none';
+            app.style.display = 'block';
+            
+            // Устанавливаем имя пользователя
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = currentUser.avatar;
+            document.getElementById('changeUserName').value = currentUser.name;
+            
+            // Загружаем данные пользователя
+            loadUserData();
+            
+            // Инициализируем интерфейс
+            initializeModules();
+            updateStats();
+            
+            // Показываем tutorial если нужно
+            if (!currentUser.settings.tutorialCompleted) {
+                setTimeout(() => showTutorial(), 1000);
+            }
+            
+            // Настраиваем автосохранение
+            setupAutoSave();
+            
+            // Показываем начальное уведомление
+            showNotification(`Добро пожаловать, ${currentUser.name}!`, 'success');
+            console.log('Application started successfully');
+        }
+
+        function initializeUserStorage() {
+            const userKey = `sapAssistantData_${currentUser.id}`;
+            if (!localStorage.getItem(userKey)) {
+                const initialData = {
+                    instructions: [],
+                    favorites: [],
+                    recent: [],
+                    backups: [],
+                    version: '1.0'
+                };
+                localStorage.setItem(userKey, JSON.stringify(initialData));
+                console.log('Initial user storage created');
+            }
+        }
+
+        function loadUserData() {
+            const userKey = `sapAssistantData_${currentUser.id}`;
+            const userData = JSON.parse(localStorage.getItem(userKey) || '{}');
+            
+            instructions = userData.instructions || [];
+            
+            // Восстанавливаем настройки
+            document.getElementById('autoSave').value = currentUser.settings.autoSave;
+            document.getElementById('themeSelect').value = currentUser.settings.theme;
+            
+            // Применяем тему
+            applyTheme(currentUser.settings.theme);
+            
+            // Отображаем инструкции
+            displayInstructions();
+            
+            console.log('User data loaded:', instructions.length, 'instructions');
+        }
+
+        function saveUserData() {
+            const userKey = `sapAssistantData_${currentUser.id}`;
+            const userData = {
+                instructions: instructions,
+                favorites: instructions.filter(i => i.isFavorite),
+                recent: getRecentInstructions(),
+                backups: [],
+                lastUpdated: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            localStorage.setItem(userKey, JSON.stringify(userData));
+            
+            // Сохраняем настройки пользователя
+            currentUser.settings.autoSave = document.getElementById('autoSave').value === 'true';
+            currentUser.settings.theme = document.getElementById('themeSelect').value;
+            localStorage.setItem('sapAssistantUser', JSON.stringify(currentUser));
+            
+            console.log('User data saved');
+        }
+
+        // ===================== ИНТЕРФЕЙС =====================
+        function initializeModules() {
+            const moduleList = document.getElementById('moduleList');
+            const moduleFilter = document.getElementById('moduleFilter');
+            
+            moduleList.innerHTML = '';
+            moduleFilter.innerHTML = '<option value="">Все модули</option>';
+            
+            sapModules.forEach(module => {
+                // Для sidebar
+                const li = document.createElement('li');
+                li.className = 'nav-item';
+                li.innerHTML = `
+                    <a href="#" class="nav-link" onclick="filterByModule('${module.id}')">
+                        <i class="fas ${module.icon}" style="color: ${module.color};"></i>
+                        ${module.name}
+                    </a>
+                `;
+                moduleList.appendChild(li);
+                
+                // Для фильтра
+                const option = document.createElement('option');
+                option.value = module.id;
+                option.textContent = module.name;
+                moduleFilter.appendChild(option);
+            });
+        }
+
+        function displayInstructions(filteredInstructions = null) {
+            const grid = document.getElementById('instructionsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            const instructionsToShow = filteredInstructions || getFilteredInstructions();
+            
+            if (instructionsToShow.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            grid.innerHTML = '';
+            
+            instructionsToShow.forEach(instruction => {
+                const card = createInstructionCard(instruction);
+                grid.appendChild(card);
+            });
+            
+            updateStats();
+        }
+
+        function createInstructionCard(instruction) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.id = instruction.id;
+            
+            const moduleInfo = sapModules.find(m => m.id === instruction.module) || sapModules[0];
+            const stepsPreview = instruction.steps.slice(0, 3).map((step, i) => `${i + 1}. ${step}`).join('<br>');
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-module" style="background-color: ${moduleInfo.color}20; color: ${moduleInfo.color};">
+                        <i class="fas ${moduleInfo.icon}"></i> ${moduleInfo.name}
+                    </div>
+                    <div class="card-title">
+                        ${instruction.title}
+                        <span style="font-size: 14px; color: ${instruction.isFavorite ? '#FFC107' : '#ccc'};">
+                            <i class="fas fa-star"></i>
+                        </span>
+                    </div>
+                    ${instruction.transactionCode ? `
+                        <div class="card-transaction">
+                            <i class="fas fa-code"></i> ${instruction.transactionCode}
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="card-body">
+                    <div class="card-steps">${stepsPreview}</div>
+                    ${instruction.tags && instruction.tags.length > 0 ? `
+                        <div class="card-tags">
+                            ${instruction.tags.slice(0, 3).map(tag => `
+                                <span class="tag">${tag.trim()}</span>
+                            `).join('')}
+                            ${instruction.tags.length > 3 ? `<span class="tag">+${instruction.tags.length - 3}</span>` : ''}
+                        </div>
+                    ` : ''}
+                    ${instruction.media && instruction.media.length > 0 ? `
+                        <div style="font-size: 12px; color: var(--sap-gray); margin-top: 10px;">
+                            <i class="fas fa-paperclip"></i> ${instruction.media.length} вложение
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="card-footer">
+                    <div style="font-size: 12px; color: var(--sap-gray);">
+                        <i class="far fa-clock"></i> ${formatDate(instruction.updatedAt)}
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); toggleFavorite('${instruction.id}')" title="${instruction.isFavorite ? 'Убрать из избранного' : 'В избранное'}">
+                            <i class="fas ${instruction.isFavorite ? 'fa-star' : 'fa-star'}"></i>
+                        </button>
+                        <button class="action-btn" onclick="event.stopPropagation(); editInstruction('${instruction.id}')" title="Редактировать">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="event.stopPropagation(); deleteInstruction('${instruction.id}')" title="Удалить">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.card-actions')) {
+                    viewInstruction(instruction.id);
+                }
+            });
+            
+            return card;
+        }
+
+        function showSection(section) {
+            currentSection = section;
+            
+            // Обновляем активные ссылки
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelector(`[onclick="showSection('${section}')"]`).classList.add('active');
+            
+            // Применяем фильтр
+            displayInstructions();
+        }
+
+        function getFilteredInstructions() {
+            let filtered = [...instructions];
+            
+            // Фильтр по секции
+            switch (currentSection) {
+                case 'favorites':
+                    filtered = filtered.filter(i => i.isFavorite);
+                    break;
+                case 'recent':
+                    filtered = filtered.sort((a, b) => 
+                        new Date(b.updatedAt) - new Date(a.updatedAt)
+                    ).slice(0, 20);
+                    break;
+            }
+            
+            // Фильтр по модулю
+            if (currentFilter) {
+                filtered = filtered.filter(i => i.module === currentFilter);
+            }
+            
+            return filtered;
+        }
+
+        // ===================== CRUD ОПЕРАЦИИ =====================
+        function showNewInstructionModal() {
+            document.getElementById('modalTitle').textContent = 'Новая инструкция';
+            document.getElementById('instructionForm').reset();
+            document.getElementById('instructionId').value = '';
+            document.getElementById('stepsContainer').innerHTML = `
+                <div class="steps-container">
+                    <input type="text" class="form-control step-input" placeholder="Шаг 1">
+                    <button type="button" class="btn btn-icon" onclick="addStep()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            `;
+            document.getElementById('mediaContainer').innerHTML = '';
+            
+            showModal();
+        }
+
+        function showModal() {
+            document.getElementById('instructionModal').classList.add('active');
+        }
+
+        function hideModal() {
+            document.getElementById('instructionModal').classList.remove('active');
+        }
+
+        function addStep() {
+            const container = document.getElementById('stepsContainer');
+            const stepCount = container.querySelectorAll('.steps-container').length + 1;
+            
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'steps-container';
+            stepDiv.innerHTML = `
+                <input type="text" class="form-control step-input" placeholder="Шаг ${stepCount}">
+                <button type="button" class="btn btn-icon" onclick="removeStep(this)">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
+            
+            container.appendChild(stepDiv);
+        }
+
+        function removeStep(button) {
+            const container = document.getElementById('stepsContainer');
+            if (container.querySelectorAll('.steps-container').length > 1) {
+                button.closest('.steps-container').remove();
+                renumberSteps();
+            }
+        }
+
+        function renumberSteps() {
+            const steps = document.querySelectorAll('.step-input');
+            steps.forEach((input, index) => {
+                input.placeholder = `Шаг ${index + 1}`;
+            });
+        }
+
+        function addMedia() {
+            const urlInput = document.getElementById('mediaInput');
+            const url = urlInput.value.trim();
+            
+            if (!url || !isValidUrl(url)) {
+                showNotification('Введите корректный URL', 'error');
+                return;
+            }
+            
+            const container = document.getElementById('mediaContainer');
+            const mediaId = generateId();
+            
+            const mediaTag = document.createElement('div');
+            mediaTag.className = 'media-tag';
+            mediaTag.innerHTML = `
+                <i class="fas fa-link"></i> ${truncateText(url, 30)}
+                <button type="button" onclick="removeMedia('${mediaId}')" style="background: none; border: none; color: var(--sap-blue); cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            mediaTag.dataset.url = url;
+            mediaTag.dataset.id = mediaId;
+            
+            container.appendChild(mediaTag);
+            urlInput.value = '';
+        }
+
+        function removeMedia(id) {
+            const element = document.querySelector(`[data-id="${id}"]`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        function saveInstruction() {
+            const id = document.getElementById('instructionId').value;
+            const title = document.getElementById('instructionTitle').value.trim();
+            const module = document.getElementById('instructionModule').value;
+            const transactionCode = document.getElementById('transactionCode').value.trim();
+            const tags = document.getElementById('instructionTags').value.split(',').map(t => t.trim()).filter(t => t);
+            const notes = document.getElementById('instructionNotes').value.trim();
+            
+            // Валидация
+            if (!title || !module) {
+                showNotification('Заполните обязательные поля', 'error');
+                return;
+            }
+            
+            // Собираем шаги
+            const steps = Array.from(document.querySelectorAll('.step-input'))
+                .map(input => input.value.trim())
+                .filter(step => step);
+            
+            if (steps.length === 0) {
+                showNotification('Добавьте хотя бы один шаг', 'error');
+                return;
+            }
+            
+            // Собираем медиа
+            const media = Array.from(document.querySelectorAll('.media-tag'))
+                .map(tag => tag.dataset.url);
+            
+            const instructionData = {
+                id: id || generateId(),
+                title,
+                module,
+                transactionCode,
+                steps,
+                media,
+                tags,
+                notes,
+                isFavorite: false,
+                createdAt: id ? instructions.find(i => i.id === id)?.createdAt || new Date().toISOString() : new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                userId: currentUser.id,
+                views: id ? instructions.find(i => i.id === id)?.views || 0 : 0
+            };
+            
+            if (id) {
+                // Обновляем существующую инструкцию
+                const index = instructions.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    instructionData.isFavorite = instructions[index].isFavorite;
+                    instructionData.views = instructions[index].views;
+                    instructions[index] = instructionData;
+                }
+            } else {
+                // Добавляем новую инструкцию
+                instructions.push(instructionData);
+            }
+            
+            saveUserData();
+            displayInstructions();
+            hideModal();
+            
+            showNotification(`Инструкция "${title}" сохранена`, 'success');
+        }
+
+        function editInstruction(id) {
+            const instruction = instructions.find(i => i.id === id);
+            if (!instruction) return;
+            
+            document.getElementById('modalTitle').textContent = 'Редактировать инструкцию';
+            document.getElementById('instructionId').value = instruction.id;
+            document.getElementById('instructionTitle').value = instruction.title;
+            document.getElementById('instructionModule').value = instruction.module;
+            document.getElementById('transactionCode').value = instruction.transactionCode || '';
+            document.getElementById('instructionTags').value = instruction.tags ? instruction.tags.join(', ') : '';
+            document.getElementById('instructionNotes').value = instruction.notes || '';
+            
+            // Шаги
+            const stepsContainer = document.getElementById('stepsContainer');
+            stepsContainer.innerHTML = '';
+            instruction.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'steps-container';
+                stepDiv.innerHTML = `
+                    <input type="text" class="form-control step-input" value="${step}" placeholder="Шаг ${index + 1}">
+                    ${index === 0 ? 
+                        '<button type="button" class="btn btn-icon" onclick="addStep()"><i class="fas fa-plus"></i></button>' :
+                        '<button type="button" class="btn btn-icon" onclick="removeStep(this)"><i class="fas fa-minus"></i></button>'
+                    }
+                `;
+                stepsContainer.appendChild(stepDiv);
+            });
+            
+            // Медиа
+            const mediaContainer = document.getElementById('mediaContainer');
+            mediaContainer.innerHTML = '';
+            instruction.media.forEach(url => {
+                const mediaId = generateId();
+                const mediaTag = document.createElement('div');
+                mediaTag.className = 'media-tag';
+                mediaTag.innerHTML = `
+                    <i class="fas fa-link"></i> ${truncateText(url, 30)}
+                    <button type="button" onclick="removeMedia('${mediaId}')" style="background: none; border: none; color: var(--sap-blue); cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                mediaTag.dataset.url = url;
+                mediaTag.dataset.id = mediaId;
+                mediaContainer.appendChild(mediaTag);
+            });
+            
+            showModal();
+        }
+
+        function viewInstruction(id) {
+            const instruction = instructions.find(i => i.id === id);
+            if (!instruction) return;
+            
+            // Увеличиваем счетчик просмотров
+            instruction.views = (instruction.views || 0) + 1;
+            instruction.updatedAt = new Date().toISOString();
+            saveUserData();
+            
+            // Показываем модальное окно с просмотром
+            document.getElementById('modalTitle').textContent = instruction.title;
+            document.getElementById('instructionId').value = instruction.id;
+            
+            const moduleInfo = sapModules.find(m => m.id === instruction.module) || sapModules[0];
+            
+            const modalBody = document.createElement('div');
+            modalBody.className = 'modal-body';
+            modalBody.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 30px;">
+                    <div>
+                        <span class="card-module" style="background-color: ${moduleInfo.color}20; color: ${moduleInfo.color};">
+                            <i class="fas ${moduleInfo.icon}"></i> ${moduleInfo.name}
+                        </span>
+                        ${instruction.transactionCode ? `
+                            <div style="margin-top: 10px;">
+                                <strong>Код транзакции:</strong> ${instruction.transactionCode}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; color: var(--sap-gray);">
+                            <i class="far fa-eye"></i> ${instruction.views} просмотров
+                        </div>
+                        <div style="font-size: 14px; color: var(--sap-gray); margin-top: 5px;">
+                            <i class="far fa-clock"></i> ${formatDate(instruction.updatedAt)}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; color: #32363A;">Шаги инструкции:</h3>
+                    <ol style="padding-left: 20px;">
+                        ${instruction.steps.map((step, index) => `
+                            <li style="margin-bottom: 10px; padding-left: 10px;">${step}</li>
+                        `).join('')}
+                    </ol>
+                </div>
+                
+                ${instruction.notes ? `
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="margin-bottom: 15px; color: #32363A;">Примечания:</h3>
+                        <div style="background: var(--sap-gray-light); padding: 15px; border-radius: var(--radius);">
+                            ${instruction.notes}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${instruction.tags && instruction.tags.length > 0 ? `
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="margin-bottom: 15px; color: #32363A;">Теги:</h3>
+                        <div class="card-tags">
+                            ${instruction.tags.map(tag => `
+                                <span class="tag">${tag}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${instruction.media && instruction.media.length > 0 ? `
+                    <div>
+                        <h3 style="margin-bottom: 15px; color: #32363A;">Медиафайлы:</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            ${instruction.media.map(url => `
+                                <a href="${url}" target="_blank" class="media-tag" style="text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> ${truncateText(url, 40)}
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            // Заменяем содержимое модального окна
+            const modalContent = document.querySelector('.modal-content');
+            const oldBody = modalContent.querySelector('.modal-body');
+            const footer = modalContent.querySelector('.modal-footer');
+            
+            oldBody.remove();
+            modalContent.insertBefore(modalBody, footer);
+            
+            // Настраиваем кнопки в футере
+            footer.innerHTML = `
+                <button class="btn" onclick="hideModal()">
+                    <i class="fas fa-times"></i> Закрыть
+                </button>
+                <button class="btn" onclick="editInstruction('${instruction.id}')">
+                    <i class="fas fa-edit"></i> Редактировать
+                </button>
+                <button class="btn btn-success" onclick="toggleFavorite('${instruction.id}')">
+                    <i class="fas ${instruction.isFavorite ? 'fa-star' : 'fa-star'}"></i>
+                    ${instruction.isFavorite ? 'Убрать из избранного' : 'В избранное'}
+                </button>
+            `;
+            
+            showModal();
+        }
+
+        function toggleFavorite(id) {
+            const instruction = instructions.find(i => i.id === id);
+            if (instruction) {
+                instruction.isFavorite = !instruction.isFavorite;
+                instruction.updatedAt = new Date().toISOString();
+                saveUserData();
+                displayInstructions();
+                
+                showNotification(
+                    instruction.isFavorite ? 'Добавлено в избранное' : 'Убрано из избранного',
+                    'info'
+                );
+            }
+        }
+
+        function deleteInstruction(id) {
+            if (!confirm('Вы уверены, что хотите удалить эту инструкцию?')) return;
+            
+            instructions = instructions.filter(i => i.id !== id);
+            saveUserData();
+            displayInstructions();
+            
+            showNotification('Инструкция удалена', 'warning');
+        }
+
+        // ===================== ПОИСК И ФИЛЬТРАЦИЯ =====================
+        function searchInstructions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                displayInstructions();
+                return;
+            }
+            
+            const filtered = instructions.filter(instruction => 
+                instruction.title.toLowerCase().includes(searchTerm) ||
+                instruction.transactionCode?.toLowerCase().includes(searchTerm) ||
+                instruction.tags?.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+                instruction.steps?.some(step => step.toLowerCase().includes(searchTerm)) ||
+                instruction.notes?.toLowerCase().includes(searchTerm)
+            );
+            
+            displayInstructions(filtered);
+        }
+
+        function filterByModule(moduleId = null) {
+            if (moduleId === null) {
+                moduleId = document.getElementById('moduleFilter').value;
+            }
+            
+            currentFilter = moduleId;
+            
+            // Обновляем выпадающий список
+            document.getElementById('moduleFilter').value = moduleId;
+            
+            displayInstructions();
+        }
+
+        // ===================== AI ПОМОЩНИК =====================
+        function toggleAIPanel() {
+            const panel = document.getElementById('aiPanel');
+            aiPanelVisible = !aiPanelVisible;
+            panel.classList.toggle('active', aiPanelVisible);
+            
+            if (aiPanelVisible) {
+                document.getElementById('aiInput').focus();
+            }
+        }
+
+        function handleAIKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendAIMessage();
+            }
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Добавляем сообщение пользователя
+            addAIMessage(message, 'user');
+            input.value = '';
+            
+            // Показываем индикатор загрузки
+            const loadingId = addAIMessage('Думаю...', 'ai', true);
+            
+            // Имитируем ответ AI (в реальном приложении здесь был бы API вызов)
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                updateAIMessage(loadingId, response);
+            }, 1500);
+        }
+
+        function addAIMessage(text, sender = 'ai', isLoading = false) {
+            const container = document.getElementById('aiMessages');
+            const messageId = generateId();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'ai-message';
+            messageDiv.style.background = sender === 'user' ? 'var(--sap-blue-light)' : 'var(--sap-gray-light)';
+            messageDiv.style.textAlign = sender === 'user' ? 'right' : 'left';
+            messageDiv.dataset.id = messageId;
+            
+            if (isLoading) {
+                messageDiv.innerHTML = `<div class="loader" style="display: inline-block;"></div> ${text}`;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            return messageId;
+        }
+
+        function updateAIMessage(id, newText) {
+            const message = document.querySelector(`[data-id="${id}"]`);
+            if (message) {
+                message.innerHTML = newText;
+            }
+        }
+
+        function generateAIResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // База знаний по SAP
+            const sapKnowledge = {
+                'как создать': 'Для создания инструкции: 1. Нажмите "Новая инструкция" 2. Заполните все поля 3. Добавьте шаги 4. Сохраните',
+                'финанс': 'В модуле FI (Финансы) основные транзакции: FB01 - Проводка, F-02 - Ввод документа, FBL3N - Просмотр проводок',
+                'материал': 'В MM (Материалы): ME21N - Создание заказа, MIGO - Поступление товаров, MIRO - Ввод счета',
+                'продаж': 'В SD (Продажи): VA01 - Создание заказа, VL01N - Создание отгрузки, VF01 - Выставление счета',
+                'транзакци': 'Популярные транзакции: SE38 - ABAP редактор, SE11 - Создание таблиц, SM30 - Обслуживание таблиц'
+            };
+            
+            for (const [keyword, response] of Object.entries(sapKnowledge)) {
+                if (lowerMessage.includes(keyword)) {
+                    return response;
+                }
+            }
+            
+            // Если не нашли ответ в базе знаний
+            const responses = [
+                "Я помогу вам создать инструкцию по SAP. Укажите, какой модуль вас интересует?",
+                "Для создания инструкции нажмите кнопку 'Новая инструкция' и заполните форму.",
+                "Я могу помочь с информацией о модулях SAP: FI, CO, MM, SD, PP, QM, HR и других.",
+                "Хотите, чтобы я сгенерировал шаблон инструкции для определенной транзакции?",
+                "Вы можете искать инструкции по модулям, транзакциям или ключевым словам."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function generateWithAI() {
+            const title = document.getElementById('instructionTitle').value;
+            const module = document.getElementById('instructionModule').value;
+            
+            if (!title && !module) {
+                showNotification('Введите хотя бы название или выберите модуль для AI генерации', 'warning');
+                return;
+            }
+            
+            // Показываем загрузку
+            document.getElementById('aiGenerateBtn').innerHTML = '<div class="loader"></div> Генерация...';
+            document.getElementById('aiGenerateBtn').disabled = true;
+            
+            // Генерируем инструкцию с помощью AI (имитация)
+            setTimeout(() => {
+                const moduleInfo = sapModules.find(m => m.id === module) || { name: 'SAP' };
+                
+                // Генерируем шаги в зависимости от модуля
+                const steps = generateStepsForModule(module, title);
+                
+                // Заполняем форму
+                document.getElementById('instructionTitle').value = title || `Инструкция по ${moduleInfo.name}`;
+                
+                // Добавляем шаги
+                const stepsContainer = document.getElementById('stepsContainer');
+                stepsContainer.innerHTML = '';
+                steps.forEach((step, index) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'steps-container';
+                    stepDiv.innerHTML = `
+                        <input type="text" class="form-control step-input" value="${step}" placeholder="Шаг ${index + 1}">
+                        ${index === 0 ? 
+                            '<button type="button" class="btn btn-icon" onclick="addStep()"><i class="fas fa-plus"></i></button>' :
+                            '<button type="button" class="btn btn-icon" onclick="removeStep(this)"><i class="fas fa-minus"></i></button>'
+                        }
+                    `;
+                    stepsContainer.appendChild(stepDiv);
+                });
+                
+                // Добавляем теги
+                const tags = generateTagsForModule(module);
+                document.getElementById('instructionTags').value = tags.join(', ');
+                
+                // Восстанавливаем кнопку
+                document.getElementById('aiGenerateBtn').innerHTML = '<i class="fas fa-robot"></i> AI Генерация';
+                document.getElementById('aiGenerateBtn').disabled = false;
+                
+                showNotification('AI сгенерировал шаблон инструкции', 'success');
+            }, 2000);
+        }
+
+        function generateStepsForModule(module, title) {
+            const baseSteps = [
+                'Войдите в систему SAP',
+                'Введите код транзакции в командной строке',
+                'Заполните обязательные поля',
+                'Нажмите кнопку "Сохранить"',
+                'Проверьте созданную запись'
+            ];
+            
+            const moduleSteps = {
+                'FI': ['Откройте транзакцию FB01', 'Выберите тип документа', 'Введите компанию и валюту', 'Заполните позиции документа', 'Проведите документ'],
+                'MM': ['Создайте заказ ME21N', 'Выберите тип заказа', 'Введите поставщика и материал', 'Укажите количество и цену', 'Сохраните заказ'],
+                'SD': ['Создайте заказ VA01', 'Введите данные клиента', 'Добавьте позиции', 'Определите условия поставки', 'Сохраните заказ'],
+                'HR': ['Откройте PA30', 'Введите номер сотрудника', 'Выберите действие', 'Введите данные', 'Сохраните изменения']
+            };
+            
+            return moduleSteps[module] || baseSteps;
+        }
+
+        function generateTagsForModule(module) {
+            const tags = {
+                'FI': ['финансы', 'бухгалтерия', 'проводка', 'документ'],
+                'CO': ['контроллинг', 'затраты', 'центр прибыли'],
+                'MM': ['материалы', 'закупки', 'склад', 'инвентаризация'],
+                'SD': ['продажи', 'дистрибуция', 'логистика', 'клиент']
+            };
+            
+            return tags[module] || ['sap', 'инструкция', 'руководство'];
+        }
+
+        // ===================== ИМПОРТ/ЭКСПОРТ =====================
+        function exportData() {
+            const userKey = `sapAssistantData_${currentUser.id}`;
+            const userData = JSON.parse(localStorage.getItem(userKey));
+            
+            if (!userData || !userData.instructions || userData.instructions.length === 0) {
+                showNotification('Нет данных для экспорта', 'warning');
+                return;
+            }
+            
+            const exportData = {
+                ...userData,
+                exportDate: new Date().toISOString(),
+                appVersion: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `sap-assistant-backup-${currentUser.id}-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Данные успешно экспортированы', 'success');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        // Проверяем структуру данных
+                        if (!importedData.instructions || !Array.isArray(importedData.instructions)) {
+                            throw new Error('Некорректный формат файла');
+                        }
+                        
+                        // Создаем резервную копию перед импортом
+                        const backup = {
+                            instructions: [...instructions],
+                            backupDate: new Date().toISOString()
+                        };
+                        
+                        const userKey = `sapAssistantData_${currentUser.id}`;
+                        const userData = JSON.parse(localStorage.getItem(userKey));
+                        userData.backups = userData.backups || [];
+                        userData.backups.push(backup);
+                        
+                        // Обновляем инструкции
+                        instructions = importedData.instructions.map(instr => ({
+                            ...instr,
+                            userId: currentUser.id // Привязываем к текущему пользователю
+                        }));
+                        
+                        userData.instructions = instructions;
+                        localStorage.setItem(userKey, JSON.stringify(userData));
+                        
+                        displayInstructions();
+                        showNotification(`Импортировано ${instructions.length} инструкций`, 'success');
+                        
+                    } catch (error) {
+                        showNotification('Ошибка при импорте файла', 'error');
+                        console.error('Import error:', error);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // ===================== УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЕМ =====================
+        function showUserMenu() {
+            document.getElementById('userMenu').classList.add('active');
+        }
+
+        function hideUserMenu() {
+            document.getElementById('userMenu').classList.remove('active');
+            
+            // Сохраняем изменения
+            const newName = document.getElementById('changeUserName').value.trim();
+            if (newName && newName !== currentUser.name) {
+                currentUser.name = newName;
+                currentUser.avatar = newName.charAt(0).toUpperCase();
+                localStorage.setItem('sapAssistantUser', JSON.stringify(currentUser));
+                
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userAvatar').textContent = currentUser.avatar;
+                
+                showNotification('Имя пользователя обновлено', 'success');
+            }
+            
+            // Применяем тему
+            const theme = document.getElementById('themeSelect').value;
+            applyTheme(theme);
+            
+            saveUserData();
+        }
+
+        function clearUserData() {
+            if (!confirm('Вы уверены? Все ваши инструкции будут удалены без возможности восстановления.')) return;
+            
+            const userKey = `sapAssistantData_${currentUser.id}`;
+            const emptyData = {
+                instructions: [],
+                favorites: [],
+                recent: [],
+                backups: [],
+                version: '1.0'
+            };
+            
+            localStorage.setItem(userKey, JSON.stringify(emptyData));
+            instructions = [];
+            displayInstructions();
+            
+            showNotification('Все данные очищены', 'warning');
+            hideUserMenu();
+        }
+
+        // ===================== ТЕМЫ И НАСТРОЙКИ =====================
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-dark', 'theme-fiori');
+            
+            if (theme === 'dark') {
+                document.body.classList.add('theme-dark');
+                document.body.style.backgroundColor = '#1a1a1a';
+                document.body.style.color = '#ffffff';
+            } else if (theme === 'fiori') {
+                document.body.classList.add('theme-fiori');
+            } else {
+                document.body.style.backgroundColor = '';
+                document.body.style.color = '';
+            }
+            
+            currentUser.settings.theme = theme;
+        }
+
+        // ===================== УТИЛИТЫ =====================
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return 'Сегодня';
+            } else if (diffDays === 1) {
+                return 'Вчера';
+            } else if (diffDays < 7) {
+                return `${diffDays} дней назад`;
+            } else {
+                return date.toLocaleDateString('ru-RU');
+            }
+        }
+
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substr(0, maxLength) + '...';
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const id = generateId();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.dataset.id = id;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Автоматическое скрытие
+            setTimeout(() => {
+                const notif = document.querySelector(`[data-id="${id}"]`);
+                if (notif) {
+                    notif.style.opacity = '0';
+                    notif.style.transform = 'translateX(100px)';
+                    setTimeout(() => notif.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        function updateStats() {
+            document.getElementById('totalInstructions').textContent = instructions.length;
+            document.getElementById('favoriteCount').textContent = instructions.filter(i => i.isFavorite).length;
+            
+            const uniqueModules = new Set(instructions.map(i => i.module));
+            document.getElementById('moduleCount').textContent = uniqueModules.size;
+            
+            // Вычисляем активность (процент заполненных инструкций с медиа и тегами)
+            const completeInstructions = instructions.filter(i => 
+                i.steps.length >= 3 && 
+                (i.media.length > 0 || i.tags.length > 0)
+            ).length;
+            
+            const activityScore = instructions.length > 0 ? 
+                Math.round((completeInstructions / instructions.length) * 100) : 0;
+            document.getElementById('activityScore').textContent = `${activityScore}%`;
+        }
+
+        function getRecentInstructions() {
+            return [...instructions]
+                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                .slice(0, 10)
+                .map(i => i.id);
+        }
+
+        function setupAutoSave() {
+            if (currentUser.settings.autoSave) {
+                // Автосохранение каждые 30 секунд при изменениях
+                let saveTimeout;
+                
+                const inputs = document.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        clearTimeout(saveTimeout);
+                        saveTimeout = setTimeout(saveUserData, 30000);
+                    });
+                });
+                
+                // Автосохранение при закрытии страницы
+                window.addEventListener('beforeunload', () => {
+                    if (document.querySelector('.modal.active')) {
+                        saveUserData();
+                    }
+                });
+            }
+        }
+
+        function showTutorial() {
+            showNotification('Добро пожаловать в SAP Assistant Pro! Начните с создания первой инструкции.', 'info');
+            
+            // Подсвечиваем кнопку создания
+            const createBtn = document.querySelector('[onclick="showNewInstructionModal()"]');
+            createBtn.classList.add('tutorial-highlight');
+            
+            setTimeout(() => {
+                createBtn.classList.remove('tutorial-highlight');
+                currentUser.settings.tutorialCompleted = true;
+                saveUserData();
+            }, 5000);
+        }
+
+        function setupEventListeners() {
+            // Глобальные обработчики клавиш
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + S для сохранения
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (document.getElementById('instructionModal').classList.contains('active')) {
+                        saveInstruction();
+                    }
+                }
+                
+                // Escape для закрытия модальных окон
+                if (e.key === 'Escape') {
+                    hideModal();
+                    hideUserMenu();
+                    if (aiPanelVisible) toggleAIPanel();
+                }
+                
+                // Ctrl/Cmd + F для поиска
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+                
+                // Ctrl/Cmd + N для новой инструкции
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    showNewInstructionModal();
+                }
+            });
+            
+            // Защита от потери данных
+            window.addEventListener('beforeunload', (e) => {
+                const modal = document.querySelector('.modal.active');
+                if (modal && !modal.id.includes('userMenu')) {
+                    e.preventDefault();
+                    e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?';
+                }
+            });
+        }
+
+        // ===================== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ =====================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded and parsed');
+            initializeApp();
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>
